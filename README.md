@@ -1,15 +1,15 @@
 <p align="center">
-<!-- <img src="https://antfu.gallerycdn.vsassets.io/extensions/antfu/selfprogrammed.browser/0.0.11/1614585407925/Microsoft.VisualStudio.Services.Icons.Default" alt="Logo" height="100"/> -->
+<!-- <img src="https://antfu.gallerycdn.vsassets.io/extensions/antfu/dot-website/0.0.11/1614585407925/Microsoft.VisualStudio.Services.Icons.Default" alt="Logo" height="100"/> -->
 </p>
 
 <h1 align="center">
-Selfprogrammed Browser
+Dot Website
 </h1>
 <p align="center">
 Embedded browser in VS Code
 </p>
 <p align="center">
-<!-- <a href="https://marketplace.visualstudio.com/items?itemName=antfu.selfprogrammed.browser" target="__blank"><img src="https://img.shields.io/visual-studio-marketplace/v/antfu.selfprogrammed.browser.svg?color=228cb3&amp;label=" alt="Visual Studio Marketplace Version" /></a> -->
+<!-- <a href="https://marketplace.visualstudio.com/items?itemName=antfu.dot-website" target="__blank"><img src="https://img.shields.io/visual-studio-marketplace/v/antfu.dot-website.svg?color=228cb3&amp;label=" alt="Visual Studio Marketplace Version" /></a> -->
 </h1>
 
 > Forked from [Browser Preview](https://github.com/auchenberg/vscode-browser-preview) by [Kenneth Auchenberg](https://github.com/auchenberg)
@@ -25,7 +25,7 @@ Embedded browser in VS Code
 - 🍃 Much lighter [`10.3MB` ➡️ `212KB`](https://user-images.githubusercontent.com/11247099/109819001-90a65a00-7c6e-11eb-8d82-465ec8b22eba.png)
 
 <p align="center">
-<table><tr><td>Run <b><code>Selfprogrammed Browser: Open New Website</code></b> command to start the browser</tr></td></table>
+<table><tr><td>Run <b><code>Dot Website: Open New Website</code></b> command to start the browser</tr></td></table>
 </p>
 
 <p align="center">
@@ -51,4 +51,4 @@ MIT - Copyright (c) 2019 Kenneth Auchenberg
 
 MIT - Copyright (c) 2021 Anthony Fu
 
-MIT - Copyright (c) 2024 Selfprogrammed
+MIT - Copyright (c) 2024 Dot Website

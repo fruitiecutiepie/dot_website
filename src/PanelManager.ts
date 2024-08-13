@@ -43,7 +43,7 @@ export class PanelManager extends EventEmitter.EventEmitter2 {
     panel.once('disposed', () => {
       if (this.current === panel) {
         this.current = undefined
-        commands.executeCommand('setContext', 'selfprogrammed.browser-active', false)
+        commands.executeCommand('setContext', 'dot-website-active', false)
       }
       this.panels.delete(panel)
       if (this.panels.size === 0) {
@@ -60,13 +60,13 @@ export class PanelManager extends EventEmitter.EventEmitter2 {
 
     panel.on('focus', () => {
       this.current = panel
-      commands.executeCommand('setContext', 'selfprogrammed.browser-active', true)
+      commands.executeCommand('setContext', 'dot-website-active', true)
     })
 
     panel.on('blur', () => {
       if (this.current === panel && window.activeTextEditor?.document !== this.current.document) {
         this.current = undefined
-        commands.executeCommand('setContext', 'selfprogrammed.browser-active', false)
+        commands.executeCommand('setContext', 'dot-website-active', false)
       }
     })
 
@@ -88,7 +88,7 @@ export class PanelManager extends EventEmitter.EventEmitter2 {
       return
 
     const panel = await this.createClient(`file://${filepath}`)
-    if (getConfig('selfprogrammed.browser.localFileAutoReload')) {
+    if (getConfig('dot-website.localFileAutoReload')) {
       panel.disposables.push(
         workspace.createFileSystemWatcher(filepath, true, false, false).onDidChange(() => {
         // TODO: check filename

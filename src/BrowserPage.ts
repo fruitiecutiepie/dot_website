@@ -11,18 +11,18 @@ type ActionData = {
 }
 
 enum ExposedFunc {
-  EmitCopy = 'EMIT_SELFPROGRAMMED_ON_COPY',
-  GetPaste = 'EMIT_SELFPROGRAMMED_GET_PASTE',
-  EnableCopyPaste = 'ENABLE_SELFPROGRAMMED_HOOK_COPY_PASTE',
+  EmitCopy = 'EMIT_DOTWEBSITE_ON_COPY',
+  GetPaste = 'EMIT_DOTWEBSITE_GET_PASTE',
+  EnableCopyPaste = 'ENABLE_DOTWEBSITE_HOOK_COPY_PASTE',
 
-  EmitContextMenu = 'EMIT_SELFPROGRAMMED_ON_CONTEXT_MENU',
-  EmitSelection = 'EMIT_SELFPROGRAMMED_ON_MOUSE_UP',
-  EmitClick = 'EMIT_SELFPROGRAMMED_ON_CLICK',
-  EmitSelectAll = 'EMIT_SELFPROGRAMMED_ON_SELECT_ALL',
+  EmitContextMenu = 'EMIT_DOTWEBSITE_ON_CONTEXT_MENU',
+  EmitSelection = 'EMIT_DOTWEBSITE_ON_MOUSE_UP',
+  EmitClick = 'EMIT_DOTWEBSITE_ON_CLICK',
+  EmitSelectAll = 'EMIT_DOTWEBSITE_ON_SELECT_ALL',
   
-  EmitFindSearchBarQuery = 'EMIT_SELFPROGRAMMED_ON_FIND_SEARCH_BAR_QUERY',
-  RemoveAllHighlights = 'EMIT_SELFPROGRAMMED_REMOVE_ALL_HIGHLIGHTS',
-  UpdateHighlights = 'EMIT_SELFPROGRAMMED_UPDATE_HIGHLIGHTS',
+  EmitFindSearchBarQuery = 'EMIT_DOTWEBSITE_ON_FIND_SEARCH_BAR_QUERY',
+  RemoveAllHighlights = 'EMIT_DOTWEBSITE_REMOVE_ALL_HIGHLIGHTS',
+  UpdateHighlights = 'EMIT_DOTWEBSITE_UPDATE_HIGHLIGHTS',
 }
 
 export class BrowserPage extends EnhancedEventEmitter {
@@ -193,7 +193,7 @@ export class BrowserPage extends EnhancedEventEmitter {
           event.preventDefault()
           const element = event.target as HTMLElement
           
-          const uid = 'selfprogrammed-oncontextmenu'
+          const uid = 'dot-website-oncontextmenu'
           element.setAttribute('data-unique-id', uid);
 
           let isContentEditable = false;

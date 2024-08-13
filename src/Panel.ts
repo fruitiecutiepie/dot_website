@@ -9,7 +9,7 @@ import type { ExtensionConfiguration } from './ExtensionConfiguration'
 import { ContentProvider } from './ContentProvider'
 
 export class Panel extends EventEmitter2 {
-  private static readonly viewType = 'selfprogrammed.browser'
+  private static readonly viewType = 'dot-website'
   private _panel: WebviewPanel | null
   public disposables: Disposable[] = []
   public url = ''
@@ -93,7 +93,7 @@ export class Panel extends EventEmitter2 {
     if (!this._panel) {
       this._panel = window.createWebviewPanel(
         Panel.viewType,
-        'Selfprogrammed Browser',
+        'Dot Website',
         this.isDebugPage ? ViewColumn.Three : ViewColumn.Active,
         {
           enableScripts: true,
@@ -262,13 +262,13 @@ export class Panel extends EventEmitter2 {
     const panel = new Panel(this.config, this.browser, this)
     this.debugPanel = panel
     panel.on('focus', () => {
-      commands.executeCommand('setContext', 'selfprogrammed.browser-debug-active', true)
+      commands.executeCommand('setContext', 'dot-website-debug-active', true)
     })
     panel.on('blur', () => {
-      commands.executeCommand('setContext', 'selfprogrammed.browser-debug-active', false)
+      commands.executeCommand('setContext', 'dot-website-debug-active', false)
     })
     panel.once('disposed', () => {
-      commands.executeCommand('setContext', 'selfprogrammed.browser-debug-active', false)
+      commands.executeCommand('setContext', 'dot-website-debug-active', false)
       this.debugPanel = undefined
     })
     const domain = `${this.config.debugHost}:${this.config.debugPort}`

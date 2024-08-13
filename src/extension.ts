@@ -19,7 +19,7 @@ export async function activate(ctx: ExtensionContext) {
 
   ctx.subscriptions.push(
     debug.registerDebugConfigurationProvider(
-      'selfprogrammed.browser',
+      'dot-website',
       debugProvider.getProvider(),
     ),
 
@@ -32,7 +32,7 @@ export async function activate(ctx: ExtensionContext) {
       }
     }),
 
-    commands.registerCommand('selfprogrammed.browser.open', async (url?: string | Uri) => {
+    commands.registerCommand('dot-website.open', async (url?: string | Uri) => {
       try {
         return await manager.createClient(url);
       } catch (e) {
@@ -40,7 +40,7 @@ export async function activate(ctx: ExtensionContext) {
       }
     }),
 
-    commands.registerCommand('selfprogrammed.browser.openActiveFile', () => {
+    commands.registerCommand('dot-website.openActiveFile', () => {
       const filename = window.activeTextEditor?.document?.fileName
       if (!filename) {
         return;
@@ -48,20 +48,20 @@ export async function activate(ctx: ExtensionContext) {
       manager.createFile(filename);
     }),
 
-    commands.registerCommand('selfprogrammed.browser.controls.refresh', () => {
+    commands.registerCommand('dot-website.controls.refresh', () => {
       manager.current?.reload();
     }),
 
-    commands.registerCommand('selfprogrammed.browser.controls.external', () => {
+    commands.registerCommand('dot-website.controls.external', () => {
       manager.current?.openExternal(true);
     }),
 
-    commands.registerCommand('selfprogrammed.browser.controls.debug', async () => {
+    commands.registerCommand('dot-website.controls.debug', async () => {
       const panel = await manager.current?.createDebugPanel();
       panel?.show();
     }),
 
-    commands.registerCommand('selfprogrammed.browser.controls.openSourceDocument', async (context?: Uri | TreeItem) => {
+    commands.registerCommand('dot-website.controls.openSourceDocument', async (context?: Uri | TreeItem) => {
       // NOTE: VS Code doesn't update resourceExtname context key correctly when a custom tree view 
       // item is right-clicked, so we can't use it in package.json's context menu `when` clause
       const uri = context instanceof TreeItem ? context.resourceUri : context;
@@ -72,7 +72,7 @@ export async function activate(ctx: ExtensionContext) {
       await manager.current?.showTextDocument();
     }),
 
-    window.registerCustomEditorProvider('selfprogrammed.browser.editor', {
+    window.registerCustomEditorProvider('dot-website.editor', {
       async resolveCustomTextEditor(document, webviewPanel, token) {
         const line_count = document.lineCount; 
         if (line_count === 0) {
@@ -103,7 +103,7 @@ export async function activate(ctx: ExtensionContext) {
     // https://code.visualstudio.com/updates/v1_53#_external-uri-opener
     // @ts-expect-error proposed API
     ctx.subscriptions.push(window.registerExternalUriOpener?.(
-      'selfprogrammed.browser.opener',
+      'dot-website.opener',
       {
         canOpenExternalUri: () => 2,
         openExternalUri(resolveUri: Uri) {
@@ -112,20 +112,20 @@ export async function activate(ctx: ExtensionContext) {
       },
       {
         schemes: ['http', 'https'],
-        label: 'Open URL using Selfprogrammed Browser',
+        label: 'Open URL using Dot Website',
       },
     ))
   } catch { }
   
   ctx.subscriptions.push(
-    commands.registerCommand('selfprogrammed.browser.open_walkthrough', async () => {
+    commands.registerCommand('dot-website.open_walkthrough', async () => {
       await commands.executeCommand(
         'workbench.action.openWalkthrough',
-        { category: 'Selfprogrammed.selfprogrammed-browser#walkthrough' },
+        { category: 'Dot Website.dot-website#walkthrough' },
         false
       );
     }),
-    commands.registerCommand('selfprogrammed.browser.walkthrough.step_1', async () => {
+    commands.registerCommand('dot-website.walkthrough.step_1', async () => {
       const root_path = workspace.workspaceFolders && workspace.workspaceFolders.length > 0
         ? workspace.workspaceFolders[0].uri.fsPath
         : undefined;
@@ -142,36 +142,36 @@ export async function activate(ctx: ExtensionContext) {
       await workspace.fs.writeFile(Uri.file(website_path), new TextEncoder().encode(`https://example.com/`));
     }),
 
-    commands.registerCommand('selfprogrammed.browser.notifications.extension_installed', async () => {
-      window.showInformationMessage(`selfprogrammed-browser installed successfully. [Learn more](command:selfprogrammed.browser.notifications.cta.learn_more)`);
-      commands.executeCommand('selfprogrammed.browser.open_walkthrough');
+    commands.registerCommand('dot-website.notifications.extension_installed', async () => {
+      window.showInformationMessage(`dot-website installed successfully. [Learn more](command:dot-website.notifications.cta.learn_more)`);
+      commands.executeCommand('dot-website.open_walkthrough');
     }),
-    commands.registerCommand('selfprogrammed.browser.notifications.extension_updated', async () => {
+    commands.registerCommand('dot-website.notifications.extension_updated', async () => {
       const cta = `See what's new`;
-      const selection = await window.showInformationMessage(`Updated extension selfprogrammed-browser to v${currentVersion}!`, cta);
+      const selection = await window.showInformationMessage(`Updated extension dot-website to v${currentVersion}!`, cta);
       if (selection === cta) {
-        await commands.executeCommand('selfprogrammed.browser.notifications.cta.see_whats_new');
+        await commands.executeCommand('dot-website.notifications.cta.see_whats_new');
       }
     }),
 
-    commands.registerCommand('selfprogrammed.browser.notifications.cta.learn_more', async () => {
-      await commands.executeCommand('vscode.open', Uri.parse('https://selfprogrammed.com/'));
+    commands.registerCommand('dot-website.notifications.cta.learn_more', async () => {
+      await commands.executeCommand('vscode.open', Uri.parse('https://dot-website.com/'));
     }),
-    commands.registerCommand('selfprogrammed.browser.notifications.cta.see_whats_new', async () => {
-      await commands.executeCommand('vscode.open', Uri.parse('https://github.com/selfprogrammed-community/selfprogrammed-browser/blob/main/CHANGELOG.md'));
+    commands.registerCommand('dot-website.notifications.cta.see_whats_new', async () => {
+      await commands.executeCommand('vscode.open', Uri.parse('https://github.com/dot-website-community/dot-website/blob/main/CHANGELOG.md'));
     }),
   );
 
   const hasBeenActivatedBefore = ctx.globalState.get('hasBeenActivatedBefore');
   if (!hasBeenActivatedBefore) {
-    await commands.executeCommand('selfprogrammed.browser.notifications.extension_installed');
+    await commands.executeCommand('dot-website.notifications.extension_installed');
     await ctx.globalState.update('hasBeenActivatedBefore', true);
 	}
 
 	const currentVersion = ctx.extension.packageJSON.version;
 	const lastVersion = ctx.globalState.get('lastVersion');
   if (hasBeenActivatedBefore && lastVersion !== currentVersion) {
-    await commands.executeCommand('selfprogrammed.browser.notifications.extension_updated');
+    await commands.executeCommand('dot-website.notifications.extension_updated');
 		await ctx.globalState.update('lastVersion', currentVersion);
   }
 }

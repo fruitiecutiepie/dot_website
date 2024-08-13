@@ -1,7 +1,7 @@
 {
-  "publisher": "Selfprogrammed",
-  "name": "selfprogrammed-browser",
-  "displayName": "Selfprogrammed Browser",
+  "publisher": "Dot Website",
+  "name": "dot-website",
+  "displayName": "Dot Website",
   "version": "0.3.9",
   "description": "Embedded browser in VS Code.",
   "license": "MIT",
@@ -23,68 +23,68 @@
   "contributes": {
     "commands": [
       {
-        "category": "Selfprogrammed Browser",
-        "command": "selfprogrammed.browser.open",
+        "category": "Dot Website",
+        "command": "dot-website.open",
         "title": "Open New Website"
       },
       {
-        "category": "Selfprogrammed Browser",
-        "command": "selfprogrammed.browser.openActiveFile",
+        "category": "Dot Website",
+        "command": "dot-website.openActiveFile",
         "title": "Open Active File in Preview"
       },
       {
-        "category": "Selfprogrammed Browser",
-        "command": "selfprogrammed.browser.controls.refresh",
+        "category": "Dot Website",
+        "command": "dot-website.controls.refresh",
         "title": "Refresh Page",
         "icon": "$(refresh)"
       },
       {
-        "category": "Selfprogrammed Browser",
-        "command": "selfprogrammed.browser.controls.external",
+        "category": "Dot Website",
+        "command": "dot-website.controls.external",
         "title": "Open page with system browser",
         "icon": "$(link-external)"
       },
       {
-        "category": "Selfprogrammed Browser",
-        "command": "selfprogrammed.browser.controls.debug",
+        "category": "Dot Website",
+        "command": "dot-website.controls.debug",
         "title": "Open DevTools",
         "icon": "$(tools)"
       },
       {
-        "category": "Selfprogrammed Browser",
-        "command": "selfprogrammed.browser.controls.openSourceDocument",
+        "category": "Dot Website",
+        "command": "dot-website.controls.openSourceDocument",
         "title": "Open .website Source File",
         "icon": "$(file-code)"
       }
     ],
     "configuration": {
-      "title": "Selfprogrammed Browser",
+      "title": "Dot Website",
       "type": "object",
       "properties": {
-        "selfprogrammed.browser.startUrl": {
-          "description": "The default start url for new Selfprogrammed Browser instances",
+        "dot-website.startUrl": {
+          "description": "The default start url for new Dot Website instances",
           "type": "string"
         },
-        "selfprogrammed.browser.chromeExecutable": {
+        "dot-website.chromeExecutable": {
           "description": "The full path to the executable, including the complete filename of the executable",
           "type": "string"
         },
-        "selfprogrammed.browser.verbose": {
+        "dot-website.verbose": {
           "default": false,
           "description": "Toggles verbose logging",
           "type": "boolean"
         },
-        "selfprogrammed.browser.debugHost": {
+        "dot-website.debugHost": {
           "default": "localhost",
           "description": "Host name for debug",
           "type": "string"
         },
-        "selfprogrammed.browser.debugPort": {
+        "dot-website.debugPort": {
           "default": 9222,
           "description": "Port number for debug, when occupied, it will try to find another one by self bumpping.",
           "type": "number"
         },
-        "selfprogrammed.browser.format": {
+        "dot-website.format": {
           "default": "png",
           "enum": [
             "png",
@@ -93,36 +93,36 @@
           "description": "The type of image used in rendering preview.",
           "type": "string"
         },
-        "selfprogrammed.browser.ignoreHttpsErrors": {
+        "dot-website.ignoreHttpsErrors": {
           "default": true,
           "description": "Ignore HTTPS errors if you are using self-signed SSL certificates",
           "type": "boolean"
         },
-        "selfprogrammed.browser.quality": {
+        "dot-website.quality": {
           "default": 100,
           "description": "Image quality of screencasting",
           "type": "number"
         },
-        "selfprogrammed.browser.everyNthFrame": {
+        "dot-website.everyNthFrame": {
           "default": 1,
           "description": "Skip for frames of screencasting",
           "type": "number"
         },
-        "selfprogrammed.browser.localFileAutoReload": {
+        "dot-website.localFileAutoReload": {
           "default": true,
           "description": "Automatically reload page on local file changes",
           "type": "boolean"
         },
-        "selfprogrammed.browser.storeUserData": {
+        "dot-website.storeUserData": {
           "default": true,
           "description": "Store cookies, localStorage, etc. on disk, so that you don't lose them when you close session. This will help you not get logged out.",
           "type": "boolean"
         },
-        "selfprogrammed.browser.proxy": {
+        "dot-website.proxy": {
           "description": "Add proxy parameters during initial loading of the browser.",
           "type": "string"
         },
-        "selfprogrammed.browser.otherArgs": {
+        "dot-website.otherArgs": {
           "description": "Add other parameters during initial loading of the browser.",
           "type": "string"
         }
@@ -130,7 +130,7 @@
     },
     "customEditors": [
       {
-        "viewType": "selfprogrammed.browser.editor",
+        "viewType": "dot-website.editor",
         "displayName": "Website",
         "selector": [
           {
@@ -142,26 +142,26 @@
     ],
     "debuggers": [
       {
-        "type": "selfprogrammed.browser",
-        "label": "Selfprogrammed Browser",
+        "type": "dot-website",
+        "label": "Dot Website",
         "configurationSnippets": [
           {
-            "label": "Selfprogrammed Browser: Launch",
-            "description": "Launch Selfprogrammed Browser to localhost",
+            "label": "Dot Website: Launch",
+            "description": "Launch Dot Website to localhost",
             "body": {
-              "type": "selfprogrammed.browser",
+              "type": "dot-website",
               "request": "launch",
-              "name": "Selfprogrammed Browser: Launch",
+              "name": "Dot Website: Launch",
               "url": "http://localhost:3000"
             }
           },
           {
-            "label": "Selfprogrammed Browser: Attach",
-            "description": "Attach to open Selfprogrammed Browser instances",
+            "label": "Dot Website: Attach",
+            "description": "Attach to open Dot Website instances",
             "body": {
-              "type": "selfprogrammed.browser",
+              "type": "dot-website",
               "request": "attach",
-              "name": "Selfprogrammed Browser: Attach"
+              "name": "Dot Website: Attach"
             }
           }
         ],
@@ -261,65 +261,58 @@
       "explorer/context": [
         {
           "when": "!explorerResourceIsFolder && resourceExtname == .website",
-          "command": "selfprogrammed.browser.controls.openSourceDocument",
-          "group": "selfprogrammed.browser"
+          "command": "dot-website.controls.openSourceDocument",
+          "group": "dot-website"
         }
       ],
       "editor/title": [
         {
-          "when": "resourceScheme == webview-panel && selfprogrammed.browser-active",
-          "command": "selfprogrammed.browser.controls.external",
+          "when": "resourceScheme == webview-panel && dot-website-active",
+          "command": "dot-website.controls.external",
           "group": "navigation"
         },
         {
-          "when": "resourceScheme == webview-panel || resourceScheme == file && selfprogrammed.browser-active && !selfprogrammed.browser-debug-active",
-          "command": "selfprogrammed.browser.controls.debug",
+          "when": "resourceScheme == webview-panel || resourceScheme == file && dot-website-active && !dot-website-debug-active",
+          "command": "dot-website.controls.debug",
           "group": "navigation"
         },
         {
-          "when": "resourceExtname == .website && selfprogrammed.browser-active && activeEditor != activeCustomEditorId",
-          "command": "selfprogrammed.browser.controls.openSourceDocument",
+          "when": "resourceExtname == .website && dot-website-active && activeEditor != activeCustomEditorId",
+          "command": "dot-website.controls.openSourceDocument",
           "group": "navigation"
         }
       ],
       "commandPalette": [
         {
-          "command": "selfprogrammed.browser.controls.external",
+          "command": "dot-website.controls.external",
           "when": "false"
         },
         {
-          "command": "selfprogrammed.browser.controls.debug",
+          "command": "dot-website.controls.debug",
           "when": "false"
         },
         {
-          "command": "selfprogrammed.browser.controls.openSourceDocument",
+          "command": "dot-website.controls.openSourceDocument",
           "when": "false"
-        }
-      ],
-      "view/item/context": [
-        {
-          "when": "view == selfprogrammed.file-explorer.tree_view && viewItem == file",
-          "command": "selfprogrammed.browser.controls.openSourceDocument",
-          "group": "selfprogrammed.browser"
         }
       ]
     },
     "walkthroughs": [
       {
         "id": "walkthrough",
-        "title": "Get Started with Selfprogrammed Browser",
+        "title": "Get Started with Dot Website",
         "description": "Reduce context switching and stay focused in a single environment with embedded browser.",
         "steps": [
           {
-            "id": "selfprogrammed.browser.walkthrough.step_1",
+            "id": "dot-website.walkthrough.step_1",
             "title": "Optimize your browser workflow",
-            "description": "Manage your web resources in a streamlined way. You're only one click away from optimizing your DX.\n[Create a .website File](command:selfprogrammed.browser.walkthrough.step_1)",
+            "description": "Manage your web resources in a streamlined way. You're only one click away from optimizing your DX.\n[Create a .website File](command:dot-website.walkthrough.step_1)",
             "media": {
               "markdown": "./assets/walkthrough/step_1.md"
             }
           },
           {
-            "id": "selfprogrammed.browser.walkthrough.step_2",
+            "id": "dot-website.walkthrough.step_2",
             "title": "Open a new website",
             "description": "Quickly launch a new tab with your desired website by opening the command palette.",
             "media": {
@@ -327,7 +320,7 @@
             }
           },
           {
-            "id": "selfprogrammed.browser.walkthrough.step_3",
+            "id": "dot-website.walkthrough.step_3",
             "title": "Preview your websites",
             "description": "See your website hot reload in VS Code.",
             "media": {
@@ -335,7 +328,7 @@
             }
           },
           {
-            "id": "selfprogrammed.browser.walkthrough.step_4",
+            "id": "dot-website.walkthrough.step_4",
             "title": "Debug websites",
             "description": "Use DevTools within VS Code for efficient website inspection and debugging.",
             "media": {

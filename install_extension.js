@@ -2,7 +2,7 @@ const { exec } = require('child_process');
 const path = require('path');
 
 // Generate the absolute path to the VSIX file using dirname
-const pathToVSIX = path.join(__dirname, 'selfprogrammed-browser-0.3.9.vsix');
+const pathToVSIX = path.join(__dirname, 'dot-website-0.3.9.vsix');
 
 (async () => {
   // Function to execute shell commands
