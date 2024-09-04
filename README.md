@@ -51,4 +51,4 @@ MIT - Copyright (c) 2019 Kenneth Auchenberg
 
 MIT - Copyright (c) 2021 Anthony Fu
 
-MIT - Copyright (c) 2024 Dot Website
+MIT - Copyright (c) 2024 Audrey Santoso

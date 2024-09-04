@@ -121,7 +121,7 @@ export async function activate(ctx: ExtensionContext) {
     commands.registerCommand('dot-website.open_walkthrough', async () => {
       await commands.executeCommand(
         'workbench.action.openWalkthrough',
-        { category: 'Dot Website.dot-website#walkthrough' },
+        { category: 'ftctpi.dot-website#walkthrough' },
         false
       );
     }),
