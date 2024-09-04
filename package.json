@@ -2,8 +2,8 @@
   "publisher": "ftctpi",
   "name": "dot-website",
   "displayName": "Dot Website",
-  "version": "0.3.9",
-  "description": "Embedded browser in VS Code.",
+  "version": "0.0.1",
+  "description": "Embedded file-based browser in VS Code.",
   "license": "MIT",
   "categories": [
     "Other"
@@ -341,7 +341,7 @@
   },
   "scripts": {
     "build:dev": "vite build && pnpm build:ts",
-    "publish": "vsce publish --no-dependencies",
+    "publish": "vsce publish --no-dependencies --allow-missing-repository",
     "package": "vsce package --no-dependencies --allow-missing-repository",
     "build": "rimraf dist && vite build && pnpm build:ts --minify",
     "build:ts": "tsup src/extension.ts --external=vscode -d dist",
