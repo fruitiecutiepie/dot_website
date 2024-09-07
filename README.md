@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">
-Dot Website
+.website
 </h1>
 <p align="center">
 Embedded file-based browser in VS Code
@@ -25,24 +25,16 @@ Embedded file-based browser in VS Code
 - 🍃 Much lighter [`10.3MB` ➡️ `212KB`](https://user-images.githubusercontent.com/11247099/109819001-90a65a00-7c6e-11eb-8d82-465ec8b22eba.png)
 
 <p align="center">
-<table><tr><td>Run <b><code>Dot Website: Open New Website</code></b> command to start the browser</tr></td></table>
+<table><tr><td>Create a file with <b><code>.website</code></b> extension to open your pinned URL in a click</tr></td></table>
+</p>
+<p align="center">or</p>
+<p align="center">
+<table><tr><td>Run <b><code>Dot Website: Open New Website</code></b> command to immediately open the browser</tr></td></table>
 </p>
 
 <p align="center">
 <img width="1192" alt="Preview 1" src="https://user-images.githubusercontent.com/11247099/109469316-d6192a80-7aa8-11eb-8a3b-d2d52bef34e4.png">
 <img width="1192" alt="Preview 2" src="https://user-images.githubusercontent.com/11247099/109469308-d1547680-7aa8-11eb-9957-23a4d8ac35e6.png">
-</p>
-
-This extension was originally built for [VS Code for Vite](https://github.com/antfu/vscode-vite).
-
-## Sponsors
-
-This project is part of my [Sponsor Program](https://github.com/sponsors/antfu).
-
-<p align="center">
-  <a href="https://cdn.jsdelivr.net/gh/antfu/static/sponsors.svg">
-    <img src='https://cdn.jsdelivr.net/gh/antfu/static/sponsors.png'/>
-  </a>
 </p>
 
 ## License

@@ -9,7 +9,7 @@ pool:
 steps:
 - task: UseNode@1
   inputs:
-    version: '18.x'
+    version: '20.x'
   displayName: 'Install Node.js'
 
 - script: |
@@ -19,6 +19,7 @@ steps:
 
 - script: |
     npm install -g pnpm
+    npm install -g @vscode/vsce
   displayName: 'Install pnpm'
 
 - script: |
@@ -52,7 +53,8 @@ steps:
   displayName: 'Publish VSIX artifact'
 
 - script: |
-    vsce publish --no-dependencies --pat $(VSCE_PAT)
+    vsce publish --no-dependencies --pat $(VSCE_PAT) --version $(ExtensionVersion)
   displayName: 'Publish to VS Code Marketplace'
   env:
-    NODE_AUTH_TOKEN: $(vsceAuthToken)
+    VSCE_PAT: $(VSCE_PAT)
+    NODE_AUTH_TOKEN: $(vsceAuthToken) # npm authentication token for vsce to authenticate with npm registry
