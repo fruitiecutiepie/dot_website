@@ -6,7 +6,7 @@
 Dot Website
 </h1>
 <p align="center">
-Embedded browser in VS Code
+Embedded file-based browser in VS Code
 </p>
 <p align="center">
 <!-- <a href="https://marketplace.visualstudio.com/items?itemName=antfu.dot-website" target="__blank"><img src="https://img.shields.io/visual-studio-marketplace/v/antfu.dot-website.svg?color=228cb3&amp;label=" alt="Visual Studio Marketplace Version" /></a> -->
