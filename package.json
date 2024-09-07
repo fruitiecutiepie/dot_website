@@ -341,13 +341,13 @@
   },
   "scripts": {
     "build:dev": "vite build && pnpm build:ts",
-    "publish": "vsce publish --no-dependencies --allow-missing-repository",
-    "package": "vsce package --no-dependencies --allow-missing-repository",
     "build": "rimraf dist && vite build && pnpm build:ts --minify",
     "build:ts": "tsup src/extension.ts --external=vscode -d dist",
+    "publish": "vsce publish --no-dependencies",
+    "package": "vsce package --no-dependencies --allow-missing-repository",
+    "install_extension": "pnpm build && pnpm package && node install_extension.js",
     "lint": "eslint .",
-    "release": "bumpp",
-    "install_extension": "pnpm build && pnpm package && node install_extension.js"
+    "release": "bumpp"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^1.0.0-beta.27",

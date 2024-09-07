@@ -1,21 +1,58 @@
-# Node.js
-# Build a general Node.js project with pnpm.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
-
 trigger:
-- master
+  branches:
+    include:
+    - master
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '10.x'
+    versionSpec: '14.x'
   displayName: 'Install Node.js'
 
 - script: |
+    git config --global user.email "bot@dot-website.com"
+    git config --global user.name "Dot Website CI"
+  displayName: 'Configure Git for CI'
+
+- script: |
+    npm install -g pnpm
+  displayName: 'Install pnpm'
+
+- script: |
     pnpm install
-    pnpm run build
-  displayName: 'pnpm install and build'
+  displayName: 'Install dependencies'
+
+- script: |
+    pnpm build
+    pnpm package
+  displayName: 'Build and package VSIX file'
+
+- script: |
+    if [ "$(Build.Reason)" == "PullRequest" ]; then
+      echo "This is a PR merge, incrementing minor version..."
+      bumpp minor --commit --tag --push --message "Bump minor version to %s [skip ci]"
+    else
+      echo "Direct push to master, incrementing patch version..."
+      bumpp patch --commit --tag --push --message "Bump patch version to %s [skip ci]"
+    fi
+    VERSION=$(node -p "require('./package.json').version")
+    echo "##vso[task.setvariable variable=ExtensionVersion]$VERSION"
+  displayName: 'Bump minor/patch version'
+  env:
+    NODE_AUTH_TOKEN: $(vsceAuthToken)
+
+- script: |
+    pnpm publish
+  displayName: 'Publish to VS Code Marketplace'
+  env:
+    NODE_AUTH_TOKEN: $(vsceAuthToken)
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: './dot-website-$(ExtensionVersion).vsix'
+    artifactName: 'dot-website-$(ExtensionVersion)'
+    publishLocation: 'pipeline'
+  displayName: 'Publish VSIX artifact'
