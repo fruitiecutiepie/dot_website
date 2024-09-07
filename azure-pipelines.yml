@@ -44,15 +44,15 @@ steps:
   env:
     NODE_AUTH_TOKEN: $(vsceAuthToken)
 
-- script: |
-    pnpm publish
-  displayName: 'Publish to VS Code Marketplace'
-  env:
-    NODE_AUTH_TOKEN: $(vsceAuthToken)
-
 - task: PublishPipelineArtifact@1
   inputs:
     targetPath: './dot-website-$(ExtensionVersion).vsix'
     artifactName: 'dot-website-$(ExtensionVersion)'
     publishLocation: 'pipeline'
   displayName: 'Publish VSIX artifact'
+
+- script: |
+    pnpm publish --no-git-checks
+  displayName: 'Publish to VS Code Marketplace'
+  env:
+    NODE_AUTH_TOKEN: $(vsceAuthToken)
