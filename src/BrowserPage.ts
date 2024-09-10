@@ -3,6 +3,7 @@ import { Browser, CDPSession, Page } from 'puppeteer-core'
 import { Clipboard } from './Clipboard'
 import { isDarkTheme } from './Config'
 
+//A small change
 type ActionData = {
   value?: any,
 
