@@ -562,7 +562,7 @@ class App extends React.Component<any, IState> {
     // return an empty promise
     return Promise.resolve()
   }
-
+// search bar feature
   private async onSearchBarActionInvoked(action: string, data: any): Promise<any> {
     switch (action) {
       case 'findSearchBarQuery':
