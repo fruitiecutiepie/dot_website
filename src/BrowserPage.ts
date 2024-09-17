@@ -227,6 +227,44 @@ export class BrowserPage extends EnhancedEventEmitter {
     ])
 
     this.page.evaluateOnNewDocument(async () => {
+      window.zoomLevel = 1;
+
+  // Add zoom listener for Ctrl + +, Ctrl + -, and Ctrl + 0
+  document.addEventListener('keydown', (event) => {
+    // Zoom in (Ctrl + +)
+    if ((event.ctrlKey || event.metaKey) && (event.key === '=' || event.key === '+')) {
+      event.preventDefault();
+      window.zoomLevel += 0.1;
+      document.body.style.zoom = window.zoomLevel.toString();
+      return;
+    }
+    
+    // Zoom out (Ctrl + -)
+    if ((event.ctrlKey || event.metaKey) && event.key === '-') {
+      event.preventDefault();
+      window.zoomLevel -= 0.1;
+      if (window.zoomLevel < 0.1) window.zoomLevel = 0.1; // Prevent zoom out beyond minimum
+      document.body.style.zoom = window.zoomLevel.toString();
+      return;
+    }
+
+    // Reset zoom (Ctrl + 0)
+    if ((event.ctrlKey || event.metaKey) && event.key === '0') {
+      event.preventDefault();
+      window.zoomLevel = 1;
+      document.body.style.zoom = '1';
+      return;
+    }
+  });
+
+  // Listen for zoom messages from the extension (if necessary)
+  window.addEventListener('message', (event) => {
+    const message = event.data;
+    if (message.command === 'zoom') {
+      window.zoomLevel = message.zoom;
+      document.body.style.zoom = window.zoomLevel.toString();
+    }
+  });
       // custom embedded devtools
       localStorage.setItem('screencastEnabled', 'false')
       localStorage.setItem('panel-selectedTab', 'console')

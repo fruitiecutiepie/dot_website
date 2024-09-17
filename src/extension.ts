@@ -1,17 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import * as vscode from 'vscode'
-import { commands, debug, window } from 'vscode'
+import * as vscode from 'vscode';
+import { commands, debug, window } from 'vscode';
 
-import { DebugProvider } from './DebugProvider'
-import { PanelManager } from './PanelManager'
-
-// TODO: Ctrl+F to search, Ctrl+R to reload page, Ctrl+Shift+C to open DevTools
-// TODO: google signin, etc.
-// TODO: right click to open in new tab, copy, paste, etc.
-// TODO: ctrl+- page. ctrl+up/down to scroll, ctrl+z to undo, ctrl+shift+z to redo
-// TODO: add ctrl+A to select all
-// TODO: maybe move open source document to horizontal split and context menu
+import { DebugProvider } from './DebugProvider';
+import { PanelManager } from './PanelManager';
 
 // Visible for Testing
 export const lint_document = async (
@@ -54,9 +47,7 @@ export const lint_document = async (
 export async function activate(ctx: vscode.ExtensionContext) {
   const manager = new PanelManager(ctx);
   const debugProvider = new DebugProvider(manager);
-  const diagnosticCollection = vscode.languages.createDiagnosticCollection('dot-website');
 
-  
   ctx.subscriptions.push(
     diagnosticCollection,
 
@@ -111,7 +102,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
       }
     }),
     commands.registerCommand('dot-website.openActiveFile', () => {
-      const filename = window.activeTextEditor?.document?.fileName
+      const filename = window.activeTextEditor?.document?.fileName;
       if (!filename) {
         return;
       }
@@ -128,10 +119,11 @@ export async function activate(ctx: vscode.ExtensionContext) {
       const panel = await manager.current?.createDebugPanel();
       panel?.show();
     }),
-    commands.registerCommand('dot-website.controls.openSourceDocument', async (context?: vscode.Uri | vscode.TreeItem) => {
+
+    commands.registerCommand('dot-website.controls.openSourceDocument', async (context?: Uri | TreeItem) => {
       // NOTE: VS Code doesn't update resourceExtname context key correctly when a custom tree view 
       // item is right-clicked, so we can't use it in package.json's context menu `when` clause
-      const uri = context instanceof vscode.TreeItem ? context.resourceUri : context;
+      const uri = context instanceof TreeItem ? context.resourceUri : context;
       if (uri && uri.fsPath.endsWith('.website')) {
         await window.showTextDocument(uri);
         return;
@@ -142,11 +134,17 @@ export async function activate(ctx: vscode.ExtensionContext) {
     window.registerCustomEditorProvider('dot-website.editor', {
       async resolveCustomTextEditor(document, webviewPanel, token) {
         const line_count = document.lineCount; 
-        if (line_count !== 1) {
+        if (line_count === 0) {
           return;
         }
   
         let url = document.lineAt(0).text;
+        // const last_url = line_count >= 2 && document.lineAt(1).text;
+  
+        // if (last_url && last_url.startsWith('http')) {
+        //   url = last_url;
+        // }
+  
         try {
           await manager.createClient(url, webviewPanel, document);
         } catch (e) {
@@ -157,7 +155,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
       webviewOptions: {
         retainContextWhenHidden: true,
       }
-    }),
+    ),
   );
 
   try {
@@ -167,7 +165,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
       'dot-website.opener',
       {
         canOpenExternalUri: () => 2,
-        openExternalUri(resolveUri: vscode.Uri) {
+        openExternalUri(resolveUri: Uri) {
           manager.createClient(resolveUri)
         },
       },
@@ -175,9 +173,9 @@ export async function activate(ctx: vscode.ExtensionContext) {
         schemes: ['http', 'https'],
         label: 'Open URL using Dot Website',
       },
-    ))
+    ));
   } catch { }
-  
+
   ctx.subscriptions.push(
     commands.registerCommand('dot-website.open_walkthrough', async () => {
       await commands.executeCommand(
@@ -186,6 +184,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
         false
       );
     }),
+
     commands.registerCommand('dot-website.walkthrough.step_1', async () => {
       const root_path = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
         ? vscode.workspace.workspaceFolders[0].uri.fsPath
@@ -210,6 +209,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
       window.showInformationMessage(`dot-website installed successfully. [Learn more](command:dot-website.notifications.cta.learn_more)`);
       commands.executeCommand('dot-website.open_walkthrough');
     }),
+    
     commands.registerCommand('dot-website.notifications.extension_updated', async () => {
       const cta = `See what's new`;
       const selection = await window.showInformationMessage(`Updated extension dot-website to v${currentVersion}!`, cta);
@@ -230,12 +230,14 @@ export async function activate(ctx: vscode.ExtensionContext) {
   if (!hasBeenActivatedBefore) {
     await commands.executeCommand('dot-website.notifications.extension_installed');
     await ctx.globalState.update('hasBeenActivatedBefore', true);
-	}
+  }
 
-	const currentVersion = ctx.extension.packageJSON.version;
-	const lastVersion = ctx.globalState.get('lastVersion');
+  const currentVersion = ctx.extension.packageJSON.version;
+  const lastVersion = ctx.globalState.get('lastVersion');
   if (hasBeenActivatedBefore && lastVersion !== currentVersion) {
     await commands.executeCommand('dot-website.notifications.extension_updated');
-		await ctx.globalState.update('lastVersion', currentVersion);
+    await ctx.globalState.update('lastVersion', currentVersion);
   }
 }
+
+export function deactivate() {}
