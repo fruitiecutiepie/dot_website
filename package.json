@@ -59,6 +59,12 @@
       },
       {
         "category": "Dot Website",
+        "command": "dot-website.controls.runDocument",
+        "title": "Run .website Document",
+        "icon": "$(run)"
+      },
+      {
+        "category": "Dot Website",
         "command": "dot-website.controls.zoomIn",
         "title": "Zoom In",
         "icon": "$(zoom-in)"
@@ -68,12 +74,6 @@
         "command": "dot-website.controls.zoomOut",
         "title": "Zoom Out",
         "icon": "$(zoom-out)"
-      },
-      {
-        "category": "Dot Website",
-        "command": "dot-website.controls.runDocument",
-        "title": "Run .website Document",
-        "icon": "$(run)"
       }
     ],
     "configuration": {
