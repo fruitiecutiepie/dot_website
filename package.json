@@ -29,6 +29,14 @@
       },
       {
         "category": "Dot Website",
+        "command": "extension.openNewTabWithHomepage",
+        "key": "ctrl+shift+n",
+        "when": "editorTextFocus",
+        "title": "Open New Website"
+      },
+
+      {
+        "category": "Dot Website",
         "command": "dot-website.openActiveFile",
         "title": "Open Active File in Preview"
       },

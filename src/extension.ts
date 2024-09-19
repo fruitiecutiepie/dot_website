@@ -40,6 +40,11 @@ export async function activate(ctx: ExtensionContext) {
       }
     }),
 
+    commands.registerCommand('dot-website.openWithHomepage', async () => {
+      const homepage = workspace.getConfiguration('browser').get('defaultHomepage', 'https://yourdefaultpage.com');
+      await commands.executeCommand('vscode.open', Uri.parse(homepage));
+    }),
+
     commands.registerCommand('dot-website.openActiveFile', () => {
       const filename = window.activeTextEditor?.document?.fileName
       if (!filename) {
