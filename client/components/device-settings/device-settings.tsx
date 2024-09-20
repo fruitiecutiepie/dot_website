@@ -43,9 +43,9 @@ class DeviceSettings extends React.Component<any, any> {
 
     const selectedDevice = this.viewportMetadata.emulatedDeviceId || ''
 
-    const procentageZoom = Math.round(this.viewportMetadata.screenZoom * 100)
+    const percentageZoom = Math.round(this.viewportMetadata.screenZoom * 100)
     const zoomLevels = [
-      { label: `Fit (${procentageZoom}%)`, value: 'fit' },
+      { label: `Fit (${percentageZoom}%)`, value: 'fit' },
       // { label: '50%', value: '0.5' },
       // { label: '75%', value: '0.75' },
       // { label: '100%', value: '1' },

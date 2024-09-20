@@ -246,10 +246,10 @@ class App extends React.Component<any, IState> {
     })
 
     // Initialize
-    this.connection.send('Page.enable')
-    this.connection.send('DOM.enable')
-    this.connection.send('CSS.enable')
-    this.connection.send('Overlay.enable')
+    this.connection.send('Page.enable', undefined)
+    this.connection.send('DOM.enable', undefined)
+    this.connection.send('CSS.enable', undefined)
+    this.connection.send('Overlay.enable', undefined)
 
     this.requestNavigationHistory()
     this.startCasting()
@@ -263,18 +263,19 @@ class App extends React.Component<any, IState> {
 
     this.requestNodeHighlighting()
 
-    await this.updateState({
+    this.setState((prevState) => ({
       frame: {
+        ...prevState.frame,
         base64Data: data,
         metadata,
       },
       viewportMetadata: {
-        ...this.state.viewportMetadata,
+        ...prevState.viewportMetadata,
         ...this.nextViewportSize,
         scrollOffsetX: metadata.scrollOffsetX,
         scrollOffsetY: metadata.scrollOffsetY,
       },
-    })
+    }));
 
     this.nextViewportSize = undefined
   }
@@ -283,11 +284,11 @@ class App extends React.Component<any, IState> {
     const { isVerboseMode } = this.state
 
     this.connection.enableVerboseLogging(isVerboseMode)
-    }
+  }
 
-    public render() {
-      return (
-        <div className="App">
+  public render() {
+    return (
+      <div className="App">
         {
           // hide navbar for devtools
           this.state.isDebug
@@ -330,7 +331,7 @@ class App extends React.Component<any, IState> {
   }
 
   public stopCasting() {
-    this.connection.send('Page.stopScreencast')
+    this.connection.send('Page.stopScreencast', undefined)
   }
 
   public startCasting() {
@@ -346,6 +347,7 @@ class App extends React.Component<any, IState> {
   private async requestNavigationHistory() {
     const history: any = await this.connection.send(
       'Page.getNavigationHistory',
+      undefined
     )
 
     if (!history)
@@ -389,7 +391,6 @@ class App extends React.Component<any, IState> {
       case 'interaction':
         this.connection.send(data.action, data.params)
         break
-
       case 'deviceChange':
         await this.updateState({
           viewportMetadata: {
@@ -527,13 +528,13 @@ class App extends React.Component<any, IState> {
   private onToolbarActionInvoked(action: string, data: any): Promise<any> {
     switch (action) {
       case 'forward':
-        this.connection.send('Page.goForward')
+        this.connection.send('Page.goForward', undefined)
         break
       case 'backward':
-        this.connection.send('Page.goBackward')
+        this.connection.send('Page.goBackward', undefined)
         break
       case 'refresh':
-        this.connection.send('Page.reload')
+        this.connection.send('Page.reload', undefined)
         break
       case 'inspect':
         this.handleToggleInspect()
@@ -548,7 +549,7 @@ class App extends React.Component<any, IState> {
         this.handleNavigate(data.url)
         break
       case 'readClipboard':
-        return this.connection.send('Clipboard.readText')
+        return this.connection.send('Clipboard.readText', undefined)
       case 'writeClipboard':
         this.handleClipboardWrite(data)
         break
@@ -591,7 +592,7 @@ class App extends React.Component<any, IState> {
         this.setState({
           isSearchEnabled: false,
         })
-        this.connection.send('extension.closeFindSearchBar')
+        this.connection.send('extension.closeFindSearchBar', undefined)
         break
     }
     // return an empty promise
@@ -601,10 +602,10 @@ class App extends React.Component<any, IState> {
   private async onViewportActionInvoked(action: string, data: any): Promise<any> {
     switch (action) {
       case 'refresh':
-        this.connection.send('Page.reload')
+        this.connection.send('Page.reload', undefined)
         break
       case 'readClipboard':
-        return this.connection.send('Clipboard.readText')
+        return this.connection.send('Clipboard.readText', undefined)
       case 'writeClipboard':
         this.handleClipboardWrite(data)
         break
@@ -637,7 +638,7 @@ class App extends React.Component<any, IState> {
   private handleToggleInspect() {
     if (this.state.isInspectEnabled) {
       // Hide browser highlight
-      this.connection.send('Overlay.hideHighlight')
+      this.connection.send('Overlay.hideHighlight', undefined)
 
       // Hide local highlight
       this.updateState({

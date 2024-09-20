@@ -1,4 +1,5 @@
 import { EventEmitter2 } from 'eventemitter2'
+import { res_async } from '../src/res'
 import Logger from './utils/logger'
 
 export default class Connection extends EventEmitter2 {
@@ -16,7 +17,7 @@ export default class Connection extends EventEmitter2 {
     window.addEventListener('message', event => this.onMessage(event))
   }
 
-  send<T>(method: string, params = {}): Promise<T> {
+  async send<T>(method: string, params: any | undefined): Promise<T> {
     const id = ++this.lastId
 
     this.logger.log('SEND ► ', method, params)
@@ -31,12 +32,17 @@ export default class Connection extends EventEmitter2 {
       }
     }
 
+    
     if (this.vscode) {
-      this.vscode.postMessage({
+      const [ok, err] = await res_async(() => this.vscode.postMessage({
         callbackId: id,
         params,
         type: method,
-      })
+      }))
+      if (err) {
+        console.error('Connection.send', err)
+        return Promise.resolve(err)
+      }
     }
 
     return new Promise((resolve, reject) => {
