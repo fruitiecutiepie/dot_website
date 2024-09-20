@@ -225,6 +225,7 @@ class App extends React.Component<any, IState> {
         selectedElementUid: result.selectedElementUid,
         selectedElementText: result.selectedElementText,
         isSelectedElementEditable: result.isSelectedElementEditable,
+        href: result.href,
       })
     })
     this.connection.on('extension.selection', (result: any) => {

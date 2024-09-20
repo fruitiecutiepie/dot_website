@@ -5,12 +5,15 @@ export interface IViewportContextMenu {
   selectedElementUid: string
   selectedElementText: string
   isSelectedElementEditable: boolean
+  href: string
 }
 
 export interface IViewportContextMenuProps extends IViewportContextMenu {
   setVisibility: (value: boolean) => void
   onActionInvoked: (action: string, data?: object) => Promise<any>
   selectedElementText: string
+  href: string
+
 }
 
 export interface IViewportContextMenuItemState {
@@ -28,6 +31,7 @@ export enum ViewportContextMenuItemsType {
   Copy = 'Copy',
   Paste = 'Paste',
   SelectAll = 'Select All',
+  CopyLink = 'Copy Link',
   Separator = '-',
 }
 

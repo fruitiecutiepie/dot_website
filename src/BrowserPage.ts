@@ -224,13 +224,16 @@ export class BrowserPage extends EnhancedEventEmitter {
       this.page.exposeFunction(ExposedFunc.RemoveAllHighlights, () => this.removeAllHighlights()),
       this.page.exposeFunction(ExposedFunc.UpdateHighlights, (text: string) => this.updateHighlights(text)),
     ])
+    // console.log("Entered here2");
     this.page.evaluateOnNewDocument(async () => {
+      // console.log("Is it entered?");
       // custom embedded devtools
       localStorage.setItem('screencastEnabled', 'false')
       localStorage.setItem('panel-selectedTab', 'console')
 
       // sync copy and paste
       if (window[ExposedFunc.EnableCopyPaste]?.()) {
+        // console.log("Entered here??");
         const copyHandler = (event: ClipboardEvent) => {
           const text = event.clipboardData?.getData('text/plain') || document.getSelection()?.toString()
           text && window[ExposedFunc.EmitCopy]?.(text)
@@ -258,6 +261,7 @@ export class BrowserPage extends EnhancedEventEmitter {
           }
         });
         document.addEventListener('contextmenu', function (event) {
+          console.log("Entered this too");
           event.preventDefault()
           const element = event.target as HTMLElement
           
@@ -265,7 +269,16 @@ export class BrowserPage extends EnhancedEventEmitter {
           element.setAttribute('data-unique-id', uid);
 
           let isContentEditable = false;
-
+          let linkUrl = ''; 
+          const target = event.target as HTMLElement;
+    
+          if (target instanceof HTMLAnchorElement) {
+            linkUrl = target.href;
+          } else if (target.closest('a') && (target.closest('a') as HTMLAnchorElement).href) {
+            // Cast the closest anchor element to HTMLAnchorElement
+            linkUrl = (target.closest('a') as HTMLAnchorElement).href;
+          }
+          // console.log("Link is ", linkUrl);
           if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
             const inputElement = element as HTMLInputElement | HTMLTextAreaElement;
             const selectionStart = inputElement.selectionStart || 0;
@@ -288,6 +301,7 @@ export class BrowserPage extends EnhancedEventEmitter {
             selectedElementUid: uid,
             selectedElementText: document.getSelection()?.toString(),
             isSelectedElementEditable: isContentEditable,
+            href: linkUrl,
           })
         });
         document.addEventListener('mouseup', (event) => {
