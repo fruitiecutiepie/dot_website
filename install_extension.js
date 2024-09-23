@@ -1,8 +1,9 @@
 const { exec } = require('child_process');
 const path = require('path');
+const { version } = require('./package.json');
 
 // Generate the absolute path to the VSIX file using dirname
-const pathToVSIX = path.join(__dirname, 'dot-website-0.3.9.vsix');
+const pathToVSIX = path.join(__dirname, `dot-website-${version}.vsix`);
 
 (async () => {
   // Function to execute shell commands

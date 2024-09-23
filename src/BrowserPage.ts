@@ -1,7 +1,8 @@
 import EventEmitterEnhancer, { EnhancedEventEmitter } from 'event-emitter-enhancer'
-import { Browser, CDPSession, Page } from 'puppeteer-core'
+import { Browser, CDPSession, Page } from 'puppeteer'
 import { Clipboard } from './Clipboard'
 import { isDarkTheme } from './Config'
+import { res, res_async } from './res'
 
 type ActionData = {
   value?: any,
@@ -71,72 +72,139 @@ export class BrowserPage extends EnhancedEventEmitter {
     // console.log('► browserPage.send', action)
     switch (action) {
       case 'Page.goForward':
-        await this.page.goForward()
+        const [forwardOk, forwardErr] = await res_async(() => this.page.goForward())
+        if (forwardErr) {
+          console.error('Page.goForward', forwardErr)
+          return
+        }
         break
       case 'Page.goBackward':
-        await this.page.goBack()
+        const [backwardOk, backwardErr] = await res_async(() => this.page.goBack())
+        if (backwardErr) {
+          console.error('Page.goBackward', backwardErr)
+          return
+        }
         break
       case 'Page.removeSelection':
-        await this.removeSelection(data.value.uid)
+        const [removeOk, removeErr] = await res_async(() => this.removeSelection(data.value.uid))
+        if (removeErr) {
+          console.error('Page.removeSelection', removeErr)
+          return
+        }
         break
       case 'Page.pasteFromClipboard':
-        await this.pasteFromClipboard(data.value.uid, data.value.text)
+        const [pasteOk, pasteErr] = await res_async(() => this.pasteFromClipboard(data.value.uid, data.value.text))
+        if (pasteErr) {
+          console.error('Page.pasteFromClipboard', pasteErr)
+          return
+        }
         break
       case 'Page.selectAll':
-        await this.selectAll(data.value.uid)
+        const [selectOk, selectErr] = await res_async(() => this.selectAll(data.value.uid))
+        if (selectErr) {
+          console.error('Page.selectAll', selectErr)
+          return
+        }
         break
       case 'extension.findSearchBarQuery':
-        const matchesLength = await this.updateHighlights(data.value.text);
-        try {
+        const [matchesLength, matchesLengthErr] = await res_async(() => this.updateHighlights(data.value.text));
+        if (matchesLengthErr) {
+          console.error('extension.findSearchBarQuery', matchesLengthErr)
+          return
+        }
+        const [findSearchBarQueryOk, findSearchBarQueryErr] = res(() => this.emit('extension.findSearchBarQuery', {
+          callbackId,
+          result: matchesLength,
+        } as any))
+        if (findSearchBarQueryErr) {
+          console.error('extension.findSearchBarQuery', findSearchBarQueryErr)
           this.emit('extension.findSearchBarQuery', {
             callbackId,
-            result: matchesLength,
+            error: findSearchBarQueryErr.message,
           } as any)
-        } catch (e) {
-          this.emit('extension.findSearchBarQuery', {
-            callbackId,
-            error: e.message,
-          } as any)
+          return
         }
         break
       case 'extension.scrollToFindSearchBarQueryMatch':
-        await this.scrollToHighlightedMatch(data.value.previousIndex, data.value.currentIndex);
+        const [scrollToOk, scrollToErr] = await res_async(() => this.scrollToHighlightedMatch(data.value.previousIndex, data.value.currentIndex));
+        if (scrollToErr) {
+          console.error('extension.scrollToFindSearchBarQueryMatch', scrollToErr)
+          return
+        }
         break
       case 'extension.closeFindSearchBar':
-        await this.removeAllHighlights();
+        const [closeFindSearchBarOk, closeFindSearchBarErr] = await res_async(() => this.removeAllHighlights());
+        if (closeFindSearchBarErr) {
+          console.error('extension.closeFindSearchBar', closeFindSearchBarErr)
+          return
+        }
         break
       case 'Clipboard.writeText':
-        await this.clipboard.writeText(data.value)
+        const [writeTextOk, writeTextErr] = await res_async(() => this.clipboard.writeText(data.value))
+        if (writeTextErr) {
+          console.error('Clipboard.writeText', writeTextErr)
+          return
+        }
         break
       case 'Clipboard.readText':
-        try {
-          this.emit({
-            callbackId,
-            result: await this.clipboard.readText(),
-          } as any)
+        const [readText, readTextErr] = await res_async(() => this.clipboard.readText())
+        if (readTextErr) {
+          console.error('Clipboard.readText', readTextErr)
+          return
         }
-        catch (e) {
+        const [readTextOk, readTextResultErr] = res(() => this.emit({
+          callbackId,
+          result: readText,
+        } as any))
+        if (readTextResultErr) {
+          console.error('Clipboard.readText', readTextResultErr)
           this.emit({
             callbackId,
-            error: e.message,
+            error: readTextResultErr.message,
           } as any)
+          return
+        }
+        break
+      case 'DOM.getNodeForLocation':
+        const [getNodeForLocationOk, getNodeForLocationErr] = await res_async(() => 
+          this.client.send('DOM.getNodeForLocation', data as any)
+        );
+        if (getNodeForLocationErr) {
+          // console.error('BrowserPage.getNodeForLocation', getNodeForLocationErr)
+          return
+        }
+        const [sendNodeOk, sendNodeErr] = res(() => this.emit({
+          callbackId,
+          result: getNodeForLocationOk,
+        } as any))
+        if (sendNodeErr) {
+          console.error('BrowserPage.sendNodeErr', sendNodeErr)
+          this.emit({
+            callbackId,
+            error: sendNodeErr.message,
+          } as any)
+          return
         }
         break
       default:
-        this.client
-          .send(action as any, data)
-          .then((result: any) => {
-            this.emit({
-              callbackId,
-              result,
-            } as any)
-          })
-          .catch((err: any) => {
-            this.emit({
-              callbackId,
-              error: err.message,
-            } as any)
-          })
+        if (action.startsWith('extension')) return;
+        
+        const [sendResOk, sendResErr] = await res_async(() => this.client.send(action as any, data))
+        if (sendResErr) {
+          return;
+        }
+        const [sendOk, sendErr] = res(() => this.emit({
+          callbackId,
+          result: sendResOk,
+        } as any))
+        if (sendErr) {
+          console.error('BrowserPage.sendErr', sendErr)
+          this.emit({
+            callbackId,
+            error: sendErr.message,
+          } as any)
+          return
+        }
     }
   }
 
@@ -188,7 +256,7 @@ export class BrowserPage extends EnhancedEventEmitter {
             window[ExposedFunc.EmitSelectAll]?.()
             return;
           }
-        })
+        });
         document.addEventListener('contextmenu', function (event) {
           event.preventDefault()
           const element = event.target as HTMLElement

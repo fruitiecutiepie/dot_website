@@ -6,17 +6,14 @@ import './screencast.css'
 class Screencast extends React.Component<any, any> {
   private canvasRef: React.RefObject<HTMLCanvasElement>
   private imageRef: React.RefObject<HTMLImageElement>
-  private frameId: number | null
 
   constructor(props: any) {
     super(props)
     this.canvasRef = React.createRef()
     this.imageRef = React.createRef()
-    this.frameId = null
 
     this.handleMouseEvent = this.handleMouseEvent.bind(this)
     this.handleKeyEvent = this.handleKeyEvent.bind(this)
-    this.renderLoop = this.renderLoop.bind(this)
 
     this.state = {
       imageZoom: 1,
@@ -24,43 +21,26 @@ class Screencast extends React.Component<any, any> {
     }
   }
 
-  static getDerivedStateFromProps(nextProps: any, prevState: any) {
-    if (nextProps.frame !== prevState.frame) {
-      return {
-        frame: nextProps.frame,
-      }
-    }
-    else { return null }
-  }
-
   public componentDidMount() {
-    this.startLoop()
   }
 
   public componentWillUnmount() {
-    this.stopLoop()
-  }
-
-  public startLoop() {
-    if (!this.frameId)
-      this.frameId = window.requestAnimationFrame(this.renderLoop)
-  }
-
-  public stopLoop() {
-    if (this.frameId)
-      window.cancelAnimationFrame(this.frameId)
-  }
-
-  public renderLoop() {
-    this.frameId = window.requestAnimationFrame(this.renderLoop) // Set up next iteration of the loop
   }
 
   public render() {
     const canvasStyle = {
       cursor: this.props.viewportMetadata?.cursor || 'auto',
     }
-    const base64Data = this.props.frame?.base64Data
-    const format = this.props.format
+    const base64Data = this.props.frame?.base64Data;
+    const format = this.props.format || 'png';
+
+    if (!base64Data || !format) {
+      return (
+        <div className="screencast" style={canvasStyle}>
+          No Frame Available
+        </div>
+      )
+    }
 
     return (
       <img
@@ -166,35 +146,36 @@ class Screencast extends React.Component<any, any> {
       return
     }
 
-    let type
+    let type;
     switch (event.type) {
       case 'keydown':
-        type = 'keyDown'
-        break
+        type = 'keyDown';
+        break;
       case 'keyup':
-        type = 'keyUp'
-        break
+        type = 'keyUp';
+        break;
       case 'keypress':
-        type = 'char'
-        break
+        type = 'char';
+        break;
       default:
-        return
+        return;
     }
 
-    const text = event.type === 'keypress' ? String.fromCharCode(event.charCode) : undefined
-    const params = {
+    const text = event.key.length === 1
+      ? event.key
+      : undefined;
+    
+    const params: any = {
       type,
       modifiers: this.modifiersForEvent(event),
-      text,
-      unmodifiedText: text ? text.toLowerCase() : undefined,
-      keyIdentifier: event.keyIdentifier,
       code: event.code,
       key: event.key,
       windowsVirtualKeyCode: event.keyCode,
       nativeVirtualKeyCode: event.keyCode,
-      autoRepeat: false,
-      isKeypad: false,
-      isSystemKey: false,
+    }
+
+    if (type === 'keyDown' && text) {
+      params.text = text;
     }
 
     this.props.onInteraction('Input.dispatchKeyEvent', params)

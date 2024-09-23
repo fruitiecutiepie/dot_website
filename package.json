@@ -2,7 +2,7 @@
   "publisher": "ftctpi",
   "name": "dot-website",
   "displayName": "Dot Website",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Embedded file-based browser in VS Code.",
   "license": "MIT",
   "categories": [
@@ -66,7 +66,7 @@
           "type": "string"
         },
         "dot-website.chromeExecutable": {
-          "description": "The full path to the executable, including the complete filename of the executable",
+          "description": "The full path to the executable, including the complete filename of the executable.\n\nCAUTION: Custom executables are not guaranteed to work.",
           "type": "string"
         },
         "dot-website.verbose": {
@@ -351,8 +351,6 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^1.0.0-beta.27",
-    "@chiragrupani/karma-chromium-edge-launcher": "^2.3.1",
-    "@types/karma-chrome-launcher": "^3.1.2",
     "@types/lodash": "^4.14.199",
     "@types/node": "^20.8.6",
     "@types/react": "^17.0.53",
@@ -368,10 +366,9 @@
     "event-emitter-enhancer": "^2.0.0",
     "eventemitter2": "^6.4.9",
     "find-up": "^6.3.0",
-    "karma-chrome-launcher": "^3.2.0",
     "lodash": "^4.17.21",
     "ovsx": "^0.8.3",
-    "puppeteer-core": "^21.3.8",
+    "puppeteer": "^23.4.0",
     "re-resizable": "^6.9.11",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

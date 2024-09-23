@@ -7,6 +7,7 @@ import type { BrowserClient } from './BrowserClient'
 import type { BrowserPage } from './BrowserPage'
 import type { ExtensionConfiguration } from './ExtensionConfiguration'
 import { ContentProvider } from './ContentProvider'
+import { res_async } from './res'
 
 export class Panel extends EventEmitter2 {
   private static readonly viewType = 'dot-website'
@@ -48,6 +49,17 @@ export class Panel extends EventEmitter2 {
     return !!this.parentPanel
   }
 
+  private async postMessage(method: string, data: any) {
+    if (this._panel) {
+      const [ok, err] = await res_async(() => this._panel!.webview.postMessage({ method, result: data }))
+      if (err) {
+        console.error('Panel.postMessage', err);
+        return;
+      }
+      return;
+    }
+  }
+
   public async launch(startUrl: string) {
     try {
       this.browserPage = await this.browser.newPage()
@@ -56,33 +68,32 @@ export class Panel extends EventEmitter2 {
         this.browserPage.updateHighlights = this.browserPage.updateHighlights.bind(this.browserPage)
         this.browserPage.scrollToHighlightedMatch = this.browserPage.scrollToHighlightedMatch.bind(this.browserPage)
 
-        const handleEvent = (eventName: string, data: any) => {
-          if (this._panel) {
-            this._panel.webview.postMessage({ method: eventName, result: data })
-          }
-        }
         this.browserPage.on('extension.findSearchBarQuery', async (data: any) => {
-          handleEvent('extension.findSearchBarQuery', data)
+          this.postMessage('extension.findSearchBarQuery', data)
         })
         this.browserPage.on('extension.openFindSearchBar', async (data: any) => {
-          handleEvent('extension.openFindSearchBar', data)
+          this.postMessage('extension.openFindSearchBar', data)
         })
         this.browserPage.on('extension.contextMenu', async (data: any) => {
-          handleEvent('extension.contextMenu', data)
+          this.postMessage('extension.contextMenu', data)
         })
         this.browserPage.on('extension.selectAll', async (data: any) => {
-          handleEvent('extension.selectAll', data)
+          this.postMessage('extension.selectAll', data)
         })
         this.browserPage.on('extension.selection', async (data: any) => {
-          handleEvent('extension.selection', data)
+          this.postMessage('extension.selection', data)
         })
         this.browserPage.on('extension.click', async (data: any) => {
-          handleEvent('extension.click', data)
+          this.postMessage('extension.click', data)
         })
 
-        this.browserPage.else((data: any) => {
-          if (this._panel)
-            this._panel.webview.postMessage(data)
+        this.browserPage.else(async (data: any) => {
+          if (this._panel) {
+            const [ok, err] = await res_async(() => this._panel!.webview.postMessage(data))
+            if (err) {
+              console.error('Panel.postMessage', err);
+            }
+          }
         })
       }
     }
@@ -222,34 +233,23 @@ export class Panel extends EventEmitter2 {
     }
 
     if (this.document) {
-      this._panel.webview.postMessage({
-        method: 'extension.pinnedUrl',
-        result: {
-          pinnedUrl: this.pinnedUrl,
-        },
+      this.postMessage('extension.pinnedUrl', {
+        pinnedUrl: this.pinnedUrl,
       })
     }
 
-    this._panel.webview.postMessage({
-      method: 'extension.appConfiguration',
-      result: {
-        ...this.config,
-        isDebug: this.isDebugPage,
-      },
+    this.postMessage('extension.appConfiguration', {
+      ...this.config,
+      isDebug: this.isDebugPage,
     })
 
     this.emit('focus')
   }
 
   public navigateTo(url: string) {
-    if (this._panel) {
-      this._panel.webview.postMessage({
-        method: 'extension.navigateTo',
-        result: {
-          url,
-        },
-      })
-    }
+    this.postMessage('extension.navigateTo', {
+      url,
+    })
     this.url = url
   }
 
@@ -310,18 +310,12 @@ export class Panel extends EventEmitter2 {
   }
 
   public setViewport(viewport: any) {
-    this._panel!.webview.postMessage({
-      method: 'extension.viewport',
-      result: viewport,
-    })
+    this.postMessage('extension.viewport', viewport)
   }
 
   public setPinnedUrl(url: string) {
-    this._panel!.webview.postMessage({
-      method: 'extension.pinnedUrl',
-      result: {
-        pinnedUrl: url,
-      },
+    this.postMessage('extension.pinnedUrl', {
+      pinnedUrl: url,
     })
   }
 

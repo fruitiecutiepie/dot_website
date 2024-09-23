@@ -70,18 +70,17 @@ export class CDPHelper {
   public async getCursorForNode(nodeInfo: any) {
     let nodeId = nodeInfo.nodeId
     if (!nodeInfo.nodeId)
-      nodeId = this.getNodeIdFromBackendId(nodeInfo.backendNodeId)
+      nodeId = await this.getNodeIdFromBackendId(nodeInfo.backendNodeId)
 
-    if (!nodeId)
-      return
+    if (!nodeId) return;
 
     const computedStyleReq = await this.connection.send('CSS.getComputedStyleForNode', {
       nodeId,
     })
+    if (!computedStyleReq.computedStyle) return;
 
     const cursorCSS = computedStyleReq.computedStyle.find((c: any) => c.name === 'cursor')
-
-    return cursorCSS.value
+    return cursorCSS.value;
   }
 
   public async getNodeIdFromBackendId(backendNodeId: any) {
@@ -90,7 +89,9 @@ export class CDPHelper {
       backendNodeIds: [backendNodeId],
     })
 
-    if (nodeIdsReq)
-      return nodeIdsReq.nodeIds[0]
+    if (!nodeIdsReq) {
+      return undefined;
+    }
+    return nodeIdsReq.nodeIds[0]
   }
 }
