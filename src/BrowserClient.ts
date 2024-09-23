@@ -2,15 +2,17 @@ import { EventEmitter } from 'events'
 import { platform } from 'os'
 import { existsSync } from 'fs'
 import { join } from 'path'
-import edge from '@chiragrupani/karma-chromium-edge-launcher'
-import chrome from 'karma-chrome-launcher'
-import type { Browser } from 'puppeteer-core'
-import puppeteer from 'puppeteer-core'
+import type { Browser } from 'puppeteer'
+import puppeteer from 'puppeteer'
 import type { ExtensionContext } from 'vscode'
 import { window, workspace } from 'vscode'
+
 import type { ExtensionConfiguration } from './ExtensionConfiguration'
 import { tryPort } from './Config'
 import { BrowserPage } from './BrowserPage'
+
+import config from '../.puppeteerrc.cjs';
+import { install_chromium } from '../install_chromium'
 
 export class BrowserClient extends EventEmitter {
   private browser: Browser | undefined
@@ -38,7 +40,12 @@ export class BrowserClient extends EventEmitter {
     if (this.config.otherArgs && this.config.otherArgs.length > 0)
       chromeArgs.push(this.config.otherArgs)
 
-    const chromePath = this.config.chromeExecutable || this.getChromiumPath()
+    let chromePath = this.config.chromeExecutable;
+    if (chromePath) {
+      console.log('BrowserClient.launchBrowser uses this.config.chromeExecutable', chromePath)
+    } else {
+      chromePath = await this.getChromiumPath()
+    }
 
     if (!chromePath) {
       window.showErrorMessage(
@@ -58,12 +65,15 @@ export class BrowserClient extends EventEmitter {
       userDataDir = join(this.ctx.globalStorageUri.fsPath, 'UserData')
 
     this.browser = await puppeteer.launch({
+      ...config,
+      headless: 'shell',
       executablePath: chromePath,
+      acceptInsecureCerts: ignoreHTTPSErrors,
       args: chromeArgs,
-      ignoreHTTPSErrors,
       ignoreDefaultArgs: ['--mute-audio'],
       userDataDir,
     })
+    console.log('BrowserClient.launchBrowser browser.version', await this.browser.version())
 
     // close the initial empty page
     ; (await this.browser.pages()).map(i => i.close())
@@ -71,12 +81,15 @@ export class BrowserClient extends EventEmitter {
 
   public async newPage(): Promise<BrowserPage> {
     if (!this.browser) {
-      await this.launchBrowser()
+      await this.launchBrowser();
     }
 
-    const page = new BrowserPage(this.browser!, await this.browser!.newPage())
-    await page.launch()
-    return page
+    const page = await this.browser!.newPage();
+
+    const browserPage = new BrowserPage(this.browser!, page);
+    await browserPage.launch();
+    
+    return browserPage;
   }
 
   public dispose(): Promise<void> {
@@ -89,18 +102,20 @@ export class BrowserClient extends EventEmitter {
     })
   }
 
-  public getChromiumPath(): string | undefined {
-    const knownChromiums = [...Object.entries(chrome), ...Object.entries(edge)]
-
-    for (const [key, info] of knownChromiums) {
-      if (!key.startsWith('launcher'))
-        continue
-
-      const path = info?.[1]?.prototype?.DEFAULT_CMD?.[process.platform]
-      if (path && typeof path === 'string' && existsSync(path))
-        return path
+  public async getChromiumPath(): Promise<string | undefined> {
+    const path = this.ctx.globalState.get('chromiumExecutablePath') as string | undefined;
+    if (path && existsSync(path)) {
+      return path;
     }
 
-    return undefined
+    window.showInformationMessage('Installing Chromium, please wait up to a minute...');
+    const [install_path, install_path_err] = await install_chromium();
+    if (install_path_err) {
+      console.error('getChromiumPath', install_path_err);
+      return undefined;
+    }
+    window.showInformationMessage(`Chromium installed. You can now use Dot Website!`);
+    this.ctx.globalState.update('chromiumExecutablePath', install_path);
+    return install_path;
   }
 }
