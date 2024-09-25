@@ -215,7 +215,7 @@ class App extends React.Component<any, IState> {
     )
 
     this.connection.on('extension.contextMenu', (result: any) => {
-      console.log('contextMenu', result)
+      // console.log('contextMenu', result)
       this.viewport.contextMenuRef.current?.setState({
         isVisible: true,
         position: {

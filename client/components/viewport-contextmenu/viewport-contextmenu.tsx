@@ -199,19 +199,21 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
     const copyLinkIndex = this.state.menuItems.findIndex(
       x => x.itemType === ViewportContextMenuItemsType.CopyLink,
     )
-
+    
     const linkLength = this.state.href?.length;
-    if(linkLength && linkLength > 0){
-      if(copyLink){
-        _menuItems[copyLinkIndex].isDisabled = false;
-        this.setState({menuItems: _menuItems});
-      }
-    }else{
-      if(copyLink){
-        _menuItems[copyLinkIndex].isDisabled = true;
-        this.setState({menuItems: _menuItems}); 
-      }
-    }
+    if (copyLinkIndex === -1) {  
+      return;  
+    }  
+    
+    if (!linkLength) {  
+      _menuItems[copyLinkIndex].isDisabled = true;  
+      this.setState({menuItems: _menuItems});  
+      return;  
+    }  
+    
+    _menuItems[copyLinkIndex].isDisabled = false;  
+    this.setState({menuItems: _menuItems});  
+    return; 
   }
 
   public render() {
@@ -259,8 +261,6 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
   }
 
   private async CopyHandler(event: React.MouseEvent<HTMLLIElement>) {
-    // const string = this.state.selectedElementText;
-    // console.log(string);
     if (this.props.onActionInvoked && this.state.selectedElementText) {
       await this.props.onActionInvoked('writeClipboard', {
         value: this.state.selectedElementText,
@@ -300,8 +300,6 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
   }
 
   private async CopyLinkHandler(event: React.MouseEvent<HTMLLIElement>) {
-    // const href = this.state.href;
-    // console.log(href);
     if (this.props.onActionInvoked && this.state.href) {
       await this.props.onActionInvoked('writeClipboard', {
         value: this.state.href,

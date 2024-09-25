@@ -224,22 +224,66 @@ export class BrowserPage extends EnhancedEventEmitter {
       this.page.exposeFunction(ExposedFunc.RemoveAllHighlights, () => this.removeAllHighlights()),
       this.page.exposeFunction(ExposedFunc.UpdateHighlights, (text: string) => this.updateHighlights(text)),
     ])
-    // console.log("Entered here2");
+
     this.page.evaluateOnNewDocument(async () => {
-      // console.log("Is it entered?");
       // custom embedded devtools
       localStorage.setItem('screencastEnabled', 'false')
       localStorage.setItem('panel-selectedTab', 'console')
 
       // sync copy and paste
       if (window[ExposedFunc.EnableCopyPaste]?.()) {
-        // console.log("Entered here??");
         const copyHandler = (event: ClipboardEvent) => {
           const text = event.clipboardData?.getData('text/plain') || document.getSelection()?.toString()
           text && window[ExposedFunc.EmitCopy]?.(text)
         }
         document.addEventListener('copy', copyHandler)
-        document.addEventListener('cut', copyHandler)
+
+        function listenToShaCopyIcon() {
+          document.querySelectorAll('button[aria-label^="Copy full SHA"]').forEach(button => {
+            button.addEventListener('click', (event) => {
+              const target = event.currentTarget as HTMLButtonElement;
+              
+              //Access the element that has the href attribute which contains SHA code
+              const shaElement = target.closest('li')?.querySelector('div span[role="tooltip"] a[href*="/commit/"]');
+
+              // Extract the full SHA from the href attribute
+              const sha = shaElement ? shaElement.getAttribute('href')?.split('/commit/')[1] : null;
+
+              if (sha) {
+                window[ExposedFunc.EmitCopy]?.(sha);
+              }else {
+                console.log("Full sha not found");
+              }
+              event.preventDefault();
+            });
+          });       
+        }
+        
+        // Wait for the DOM to fully load and set up event listeners to handle dynamic content changes,
+        document.addEventListener('DOMContentLoaded', () => {
+          // Call the function initially when the page loads
+          listenToShaCopyIcon();
+
+          // Detect URL changes with popstate
+          window.addEventListener('popstate', function() {
+            listenToShaCopyIcon();
+          });
+
+          // Set up a MutationObserver to detect DOM changes
+          const observer = new MutationObserver(() => {
+            listenToShaCopyIcon();
+          });
+
+          // Ensure the body exists before observing
+          const bodyElement = document.body;
+          if (bodyElement) {
+            observer.observe(bodyElement, { childList: true, subtree: true });
+          } else {
+            console.error("Body element not found.");
+          }
+        });
+
+        document.addEventListener('cut', copyHandler)       
         document.addEventListener('paste', async (event) => {
           event.preventDefault()
           const text = await window[ExposedFunc.GetPaste]?.()

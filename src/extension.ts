@@ -16,7 +16,6 @@ import { PanelManager } from './PanelManager'
 export async function activate(ctx: ExtensionContext) {
   const manager = new PanelManager(ctx);
   const debugProvider = new DebugProvider(manager);
-  console.log("Please appear");
 
   ctx.subscriptions.push(
     debug.registerDebugConfigurationProvider(

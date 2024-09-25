@@ -46,6 +46,7 @@ export class BrowserClient extends EventEmitter {
     } else {
       chromePath = await this.getChromiumPath()
     }
+    console.log('chromePath', chromePath);
 
     if (!chromePath) {
       window.showErrorMessage(
