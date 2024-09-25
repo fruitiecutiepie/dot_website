@@ -263,8 +263,6 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
   }
 
   private async CopyHandler(event: React.MouseEvent<HTMLLIElement>) {
-    // const string = this.state.selectedElementText;
-    // console.log(string);
     if (this.props.onActionInvoked && this.state.selectedElementText) {
       await this.props.onActionInvoked('writeClipboard', {
         value: this.state.selectedElementText,
