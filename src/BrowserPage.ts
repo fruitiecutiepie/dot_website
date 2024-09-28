@@ -224,6 +224,7 @@ export class BrowserPage extends EnhancedEventEmitter {
       this.page.exposeFunction(ExposedFunc.RemoveAllHighlights, () => this.removeAllHighlights()),
       this.page.exposeFunction(ExposedFunc.UpdateHighlights, (text: string) => this.updateHighlights(text)),
     ])
+
     this.page.evaluateOnNewDocument(async () => {
       // custom embedded devtools
       localStorage.setItem('screencastEnabled', 'false')
@@ -236,7 +237,53 @@ export class BrowserPage extends EnhancedEventEmitter {
           text && window[ExposedFunc.EmitCopy]?.(text)
         }
         document.addEventListener('copy', copyHandler)
-        document.addEventListener('cut', copyHandler)
+
+        function listenToShaCopyIcon() {
+          document.querySelectorAll('button[aria-label^="Copy full SHA"]').forEach(button => {
+            button.addEventListener('click', (event) => {
+              const target = event.currentTarget as HTMLButtonElement;
+              
+              //Access the element that has the href attribute which contains SHA code
+              const shaElement = target.closest('li')?.querySelector('div span[role="tooltip"] a[href*="/commit/"]');
+
+              // Extract the full SHA from the href attribute
+              const sha = shaElement ? shaElement.getAttribute('href')?.split('/commit/')[1] : null;
+
+              if (sha) {
+                window[ExposedFunc.EmitCopy]?.(sha);
+              }else {
+                console.log("Full sha not found");
+              }
+              event.preventDefault();
+            });
+          });       
+        }
+        
+        // Wait for the DOM to fully load and set up event listeners to handle dynamic content changes,
+        document.addEventListener('DOMContentLoaded', () => {
+          // Call the function initially when the page loads
+          listenToShaCopyIcon();
+
+          // Detect URL changes with popstate
+          window.addEventListener('popstate', function() {
+            listenToShaCopyIcon();
+          });
+
+          // Set up a MutationObserver to detect DOM changes
+          const observer = new MutationObserver(() => {
+            listenToShaCopyIcon();
+          });
+
+          // Ensure the body exists before observing
+          const bodyElement = document.body;
+          if (bodyElement) {
+            observer.observe(bodyElement, { childList: true, subtree: true });
+          } else {
+            console.error("Body element not found.");
+          }
+        });
+
+        document.addEventListener('cut', copyHandler)       
         document.addEventListener('paste', async (event) => {
           event.preventDefault()
           const text = await window[ExposedFunc.GetPaste]?.()
@@ -258,6 +305,7 @@ export class BrowserPage extends EnhancedEventEmitter {
           }
         });
         document.addEventListener('contextmenu', function (event) {
+          console.log("Entered this too");
           event.preventDefault()
           const element = event.target as HTMLElement
           
@@ -265,7 +313,16 @@ export class BrowserPage extends EnhancedEventEmitter {
           element.setAttribute('data-unique-id', uid);
 
           let isContentEditable = false;
-
+          let linkUrl = ''; 
+          const target = event.target as HTMLElement;
+    
+          if (target instanceof HTMLAnchorElement) {
+            linkUrl = target.href;
+          } else if (target.closest('a') && (target.closest('a') as HTMLAnchorElement).href) {
+            // Cast the closest anchor element to HTMLAnchorElement
+            linkUrl = (target.closest('a') as HTMLAnchorElement).href;
+          }
+          // console.log("Link is ", linkUrl);
           if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
             const inputElement = element as HTMLInputElement | HTMLTextAreaElement;
             const selectionStart = inputElement.selectionStart || 0;
@@ -288,6 +345,7 @@ export class BrowserPage extends EnhancedEventEmitter {
             selectedElementUid: uid,
             selectedElementText: document.getSelection()?.toString(),
             isSelectedElementEditable: isContentEditable,
+            href: linkUrl,
           })
         });
         document.addEventListener('mouseup', (event) => {
