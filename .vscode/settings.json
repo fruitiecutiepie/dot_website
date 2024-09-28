@@ -13,7 +13,8 @@
     "source.fixAll": "explicit",
     "source.organizeImports": "never"
   },
-
+  
+  
   // Silent the stylistic rules in you IDE, but still auto fix them
   "eslint.rules.customizations": [
     { "rule": "style/*", "severity": "off" },
@@ -39,5 +40,7 @@
     "json",
     "jsonc",
     "yaml"
-  ]
+  ],
+  // Add default homepage for new tab
+"browser.defaultHomepage": "https://yourdefaultpage.com"
 }
