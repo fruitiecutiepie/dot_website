@@ -45,12 +45,16 @@ steps:
     PNPM_STORE_PATH: $(PNPM_STORE_PATH)
 
 - script: |
-    pnpm build
-    pnpm package
-  displayName: 'Build and package VSIX file'
-
-- script: |
     set -x  # Enable detailed logging for the script
+    # Check if the 'origin' remote exists
+    if ! git remote | grep origin; then
+      echo "Adding 'origin' remote..."
+      git remote add origin https://$(GITHUB_PAT)@github.com/fruitiecutiepie/dot_website.git
+    else
+      echo "'origin' remote already exists. Updating the URL..."
+      git remote set-url origin https://$(GITHUB_PAT)@github.com/fruitiecutiepie/dot_website.git
+    fi
+
     if [ "$(Build.Reason)" == "PullRequest" ]; then
       echo "This is a PR merge, incrementing minor version..."
       bumpp minor --commit --tag --push false --message "Bump minor version to %s [skip ci]" --yes
@@ -64,7 +68,13 @@ steps:
     echo "##vso[task.setvariable variable=ExtensionVersion]$VERSION"
   displayName: 'Bump minor/patch version'
   env:
+    GITHUB_PAT: $(GitHubToken)
     NODE_AUTH_TOKEN: $(vsceAuthToken)
+
+- script: |
+    pnpm build
+    pnpm package
+  displayName: 'Build and package VSIX file'
 
 - task: PublishPipelineArtifact@1
   inputs:
