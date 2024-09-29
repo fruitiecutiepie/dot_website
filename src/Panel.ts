@@ -53,7 +53,7 @@ export class Panel extends EventEmitter2 {
     if (this._panel) {
       const [ok, err] = await res_async(() => this._panel!.webview.postMessage({ method, result: data }))
       if (err) {
-        console.error('Panel.postMessage', err);
+        console.error(`Panel.postMessage method ${method} data ${JSON.stringify(data, null, 2)} err ${err}`);
         return;
       }
       return;
@@ -91,7 +91,7 @@ export class Panel extends EventEmitter2 {
           if (this._panel) {
             const [ok, err] = await res_async(() => this._panel!.webview.postMessage(data))
             if (err) {
-              console.error('Panel.postMessage', err);
+              console.error(`Panel.postMessage data ${JSON.stringify(data, null, 2)} err ${err}`);
             }
           }
         })
@@ -228,6 +228,9 @@ export class Panel extends EventEmitter2 {
     )
 
     if (startUrl) {
+      if (!startUrl.startsWith('http')) {
+        startUrl = `https://${startUrl}`
+      }
       this.config.startUrl = startUrl
       this.url = this.url || startUrl
     }

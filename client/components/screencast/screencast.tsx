@@ -35,11 +35,8 @@ class Screencast extends React.Component<any, any> {
     const format = this.props.format || 'png';
 
     if (!base64Data || !format) {
-      return (
-        <div className="screencast" style={canvasStyle}>
-          No Frame Available
-        </div>
-      )
+      this.props.onError('No Frame Available')
+      return;
     }
 
     return (
