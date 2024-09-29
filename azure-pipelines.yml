@@ -14,6 +14,13 @@ steps:
     version: '20.x'
   displayName: 'Install Node.js'
 
+- task: Cache@2  # Cache the pnpm store and node_modules
+  inputs:
+    key: 'pnpm-$(Agent.OS)-$(Build.SourcesDirectory)/pnpm-lock.yaml'
+    restoreKeys: |
+      pnpm-$(Agent.OS)-
+    path: '~/.pnpm-store'  # Cache the pnpm store to improve install time
+
 - script: |
     git config --global user.email "bot@dot-website.com"
     git config --global user.name "Dot Website CI"
@@ -36,16 +43,18 @@ steps:
   displayName: 'Build and package VSIX file'
 
 - script: |
+    set -x  # Enable detailed logging for the script
     if [ "$(Build.Reason)" == "PullRequest" ]; then
       echo "This is a PR merge, incrementing minor version..."
-      bumpp minor --commit --tag --push --message "Bump minor version to %s [skip ci]"
+      bumpp minor --commit --tag --push --message "Bump minor version to %s [skip ci]" --yes
     else
       echo "Direct push to master, incrementing patch version..."
-      bumpp patch --commit --tag --push --message "Bump patch version to %s [skip ci]"
+      bumpp patch --commit --tag --push --message "Bump patch version to %s [skip ci]" --yes
     fi
     VERSION=$(node -p "require('./package.json').version")
     echo "##vso[task.setvariable variable=ExtensionVersion]$VERSION"
   displayName: 'Bump minor/patch version'
+  timeoutInMinutes: 10  # Timeout after 10 minutes to avoid long hangs
   env:
     NODE_AUTH_TOKEN: $(vsceAuthToken)
 
@@ -57,10 +66,11 @@ steps:
   displayName: 'Publish VSIX artifact'
 
 - script: |
+    set -x  # Enable verbose output for the script
     echo "Publishing extension v$(ExtensionVersion) to VS Code Marketplace..."
-    vsce publish --no-dependencies --allow-missing-repository --version $(ExtensionVersion) --pat $(VSCE_PAT)
+    vsce publish --no-dependencies --allow-missing-repository --version $(ExtensionVersion) --pat $(VSCE_PAT) --verbose
     echo "vsce publish command completed."
   displayName: 'Publish to VS Code Marketplace'
   env:
     VSCE_PAT: $(VSCE_PAT)
-    NODE_AUTH_TOKEN: $(vsceAuthToken) # npm authentication token for vsce to authenticate with npm registry
+    NODE_AUTH_TOKEN: $(vsceAuthToken)
