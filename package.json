@@ -18,6 +18,7 @@
     "onOpenExternalUri:https",
     "onDebugInitialConfigurations",
     "onDebug",
+    "onLanguage:dot-website",
     "onFileSystem:vsls"
   ],
   "contributes": {
@@ -55,6 +56,12 @@
         "command": "dot-website.controls.openSourceDocument",
         "title": "Open .website Source File",
         "icon": "$(file-code)"
+      },
+      {
+        "category": "Dot Website",
+        "command": "dot-website.controls.runDocument",
+        "title": "Run .website Document",
+        "icon": "$(run)"
       }
     ],
     "configuration": {
@@ -138,6 +145,17 @@
           }
         ],
         "priority": "default"
+      }
+    ],
+    "languages": [
+      {
+        "id": "dot-website",
+        "extensions": [
+          ".website"
+        ],
+        "aliases": [
+          "Dot Website"
+        ]
       }
     ],
     "debuggers": [
@@ -277,8 +295,13 @@
           "group": "navigation"
         },
         {
-          "when": "resourceExtname == .website && dot-website-active && activeEditor != activeCustomEditorId",
+          "when": "resourceScheme == webview-panel && dot-website-active && activeEditor != activeCustomEditorId",
           "command": "dot-website.controls.openSourceDocument",
+          "group": "navigation"
+        },
+        {
+          "when": "editorLangId == dot-website && !dot-website-active",
+          "command": "dot-website.controls.runDocument",
           "group": "navigation"
         }
       ],
@@ -294,6 +317,10 @@
         {
           "command": "dot-website.controls.openSourceDocument",
           "when": "false"
+        },
+        {
+          "command": "dot-website.controls.runDocument",
+          "when": "editorLangId == dot-website"
         }
       ]
     },
@@ -343,7 +370,7 @@
     "build:dev": "vite build && pnpm build:ts",
     "build": "rimraf dist && vite build && pnpm build:ts --minify",
     "build:ts": "tsup src/extension.ts --external=vscode -d dist",
-    "publish": "vsce publish --no-dependencies",
+    "publish": "vsce publish --no-dependencies --allow-missing-repository",
     "package": "vsce package --no-dependencies --allow-missing-repository",
     "install_extension": "pnpm build && pnpm package && node install_extension.js",
     "lint": "eslint .",
