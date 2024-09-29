@@ -51,6 +51,7 @@ class Viewport extends React.Component<any, IViewportState> {
     this.handleInspectElement = this.handleInspectElement.bind(this)
     this.handleInspectHighlightRequested = this.handleInspectHighlightRequested.bind(this)
     this.handleScreencastInteraction = this.handleScreencastInteraction.bind(this)
+    this.handleScreencastError = this.handleScreencastError.bind(this)
     this.handleResizeStop = this.handleResizeStop.bind(this)
     this.handleMouseMoved = this.handleMouseMoved.bind(this)
     this.onActionInvoked = this.props.onActionInvoked.bind(this)
@@ -141,6 +142,7 @@ class Viewport extends React.Component<any, IViewportState> {
                 onInspectHighlightRequested={this.handleInspectHighlightRequested}
                 onInteraction={this.handleScreencastInteraction}
                 onMouseMoved={this.handleMouseMoved}
+                onError={this.handleScreencastError}
               />
             </Resizable>
           </>
@@ -293,6 +295,12 @@ class Viewport extends React.Component<any, IViewportState> {
 
   private emitViewportChanges(newViewport: any) {
     this.props.onViewportChanged('size', newViewport)
+  }
+
+  private handleScreencastError(errorMessage: string) {
+    this.props.onViewportChanged('error', {
+      errorMessage,
+    })
   }
 }
 

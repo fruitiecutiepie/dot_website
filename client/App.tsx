@@ -414,7 +414,17 @@ class App extends React.Component<any, IState> {
             width: data.width,
           }
         }
-
+        break
+      case 'error':
+        console.log('error', JSON.stringify(data, null, 2))
+        await this.updateState({
+          viewportMetadata: {
+            ...this.state.viewportMetadata,
+            isLoading: false,
+            loadingPercent: 0,
+          },
+          errorText: data.errorMessage
+        })
         break
     }
   }

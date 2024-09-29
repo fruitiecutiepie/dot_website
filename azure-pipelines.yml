@@ -50,11 +50,11 @@ steps:
 
     if [ "$(Build.Reason)" == "PullRequest" ]; then
       echo "This is a PR merge, incrementing minor version..."
-      bumpp minor --commit --tag --push false --message "Bump minor version to %s [skip ci]" --yes
+      bumpp minor --commit --tag --push false --commit "Bump minor version to %s [skip ci]" --yes
       git push origin HEAD:$(Build.SourceBranchName)
     else
       echo "Direct push to master, incrementing patch version..."
-      bumpp patch --commit --tag --push false --message "Bump patch version to %s [skip ci]" --yes
+      bumpp patch --commit --tag --push false --commit "Bump patch version to %s [skip ci]" --yes
       git push origin HEAD:$(Build.SourceBranchName)
     fi
     VERSION=$(node -p "require('./package.json').version")
@@ -70,6 +70,7 @@ steps:
   displayName: 'Build and package VSIX file'
 
 - task: PublishPipelineArtifact@1
+  name: PublishVsixArtifact
   inputs:
     targetPath: './dot-website-$(ExtensionVersion).vsix'
     artifactName: 'dot-website-$(ExtensionVersion)'
@@ -78,9 +79,8 @@ steps:
 
 - script: |
     set -x  # Enable verbose output for the script
-    echo "Publishing extension v$(ExtensionVersion) to VS Code Marketplace..."
-    vsce publish --no-dependencies --allow-missing-repository --version $(ExtensionVersion) --pat $(VSCE_PAT) --verbose
-    echo "vsce publish command completed."
+    echo "Publishing extension v$(ExtensionVersion) from $(Pipeline.Workspace)/dot-website-$(ExtensionVersion).vsix to VS Code Marketplace..."
+    vsce publish --no-dependencies --allow-missing-repository --version $(ExtensionVersion) --pat $(VSCE_PAT) --verbose --skip-duplicate --packagePath $(Pipeline.Workspace)/dot-website-$(ExtensionVersion).vsix
   displayName: 'Publish to VS Code Marketplace'
   env:
     VSCE_PAT: $(VSCE_PAT)
