@@ -23,7 +23,8 @@ steps:
 - script: |
     npm install -g pnpm
     npm install -g @vscode/vsce
-  displayName: 'Install pnpm'
+    npm install -g bumpp
+  displayName: 'Install pnpm, vsce, and bumpp'
 
 - script: |
     pnpm install
@@ -56,7 +57,9 @@ steps:
   displayName: 'Publish VSIX artifact'
 
 - script: |
-    vsce publish --no-dependencies --allow-missing-repository --version $(ExtensionVersion)
+    echo "Publishing extension v$(ExtensionVersion) to VS Code Marketplace..."
+    vsce publish --no-dependencies --allow-missing-repository --version $(ExtensionVersion) --pat $(VSCE_PAT)
+    echo "vsce publish command completed."
   displayName: 'Publish to VS Code Marketplace'
   env:
     VSCE_PAT: $(VSCE_PAT)
