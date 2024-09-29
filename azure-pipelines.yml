@@ -19,7 +19,7 @@ steps:
     key: 'pnpm-$(Agent.OS)-$(Build.SourcesDirectory)/pnpm-lock.yaml'
     restoreKeys: |
       pnpm-$(Agent.OS)-
-    path: '~/.pnpm-store'  # Cache the pnpm store to improve install time
+    path: ~/.pnpm-store
 
 - script: |
     git config --global user.email "bot@dot-website.com"
