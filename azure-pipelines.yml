@@ -53,15 +53,16 @@ steps:
     set -x  # Enable detailed logging for the script
     if [ "$(Build.Reason)" == "PullRequest" ]; then
       echo "This is a PR merge, incrementing minor version..."
-      bumpp minor --commit --tag --push --message "Bump minor version to %s [skip ci]" --yes
+      bumpp minor --commit --tag --push false --message "Bump minor version to %s [skip ci]" --yes
+      git push origin HEAD:$(Build.SourceBranchName)
     else
       echo "Direct push to master, incrementing patch version..."
-      bumpp patch --commit --tag --push --message "Bump patch version to %s [skip ci]" --yes
+      bumpp patch --commit --tag --push false --message "Bump patch version to %s [skip ci]" --yes
+      git push origin HEAD:$(Build.SourceBranchName)
     fi
     VERSION=$(node -p "require('./package.json').version")
     echo "##vso[task.setvariable variable=ExtensionVersion]$VERSION"
   displayName: 'Bump minor/patch version'
-  timeoutInMinutes: 10  # Timeout after 10 minutes to avoid long hangs
   env:
     NODE_AUTH_TOKEN: $(vsceAuthToken)
 
