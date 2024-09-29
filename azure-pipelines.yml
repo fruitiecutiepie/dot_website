@@ -8,18 +8,22 @@ pr: none
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  PNPM_STORE_PATH: $(Pipeline.Workspace)/.pnpm-store  # Use a shared pnpm store path in the pipeline
+
 steps:
 - task: UseNode@1
   inputs:
     version: '20.x'
   displayName: 'Install Node.js'
 
-- task: Cache@2  # Cache the pnpm store and node_modules
+- task: Cache@2
   inputs:
-    key: 'pnpm-$(Agent.OS)-$(Build.SourcesDirectory)/pnpm-lock.yaml'
+    key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
     restoreKeys: |
-      pnpm-$(Agent.OS)-
-    path: ~/.pnpm-store
+      pnpm | "$(Agent.OS)"
+    path: $(PNPM_STORE_PATH)  # Cache the pnpm store path
+  displayName: Cache pnpm store
 
 - script: |
     git config --global user.email "bot@dot-website.com"
@@ -34,8 +38,11 @@ steps:
   displayName: 'Install pnpm, vsce, and bumpp'
 
 - script: |
+    pnpm config set store-dir $(PNPM_STORE_PATH)  # Set the pnpm store directory to a specific path
     pnpm install
   displayName: 'Install dependencies'
+  env:
+    PNPM_STORE_PATH: $(PNPM_STORE_PATH)
 
 - script: |
     pnpm build
