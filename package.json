@@ -2,7 +2,7 @@
   "publisher": "ftctpi",
   "name": "dot-website",
   "displayName": "Dot Website",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Embedded file-based browser in VS Code.",
   "license": "MIT",
   "categories": [
