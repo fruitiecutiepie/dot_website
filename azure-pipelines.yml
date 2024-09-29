@@ -56,7 +56,7 @@ steps:
   displayName: 'Publish VSIX artifact'
 
 - script: |
-    vsce publish --no-dependencies --version $(ExtensionVersion)
+    vsce publish --no-dependencies --allow-missing-repository --version $(ExtensionVersion)
   displayName: 'Publish to VS Code Marketplace'
   env:
     VSCE_PAT: $(VSCE_PAT)
