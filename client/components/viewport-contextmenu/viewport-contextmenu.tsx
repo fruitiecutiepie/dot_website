@@ -103,7 +103,7 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
     }
     if (nextProps.selectedElementText !== this.state.selectedElementText) {
       this.setState({
-        selectedElementText: nextProps.selectedElementText,
+        selectedElementText: this.state.selectedElementText,    //** 
       })
       this.manageMenuItemsStatus()
     }
@@ -240,8 +240,12 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
   }
 
   public handleClickOutside(e: MouseEvent) {
-    if (this.ref && !this.ref.contains(e.target as Node))
-      this.props.setVisibility(false)
+    // console.log("REF: ", this.ref)
+    // console.log("Target: ", e.target)
+    if (this.ref && !this.ref.contains(e.target as Node)){
+      // console.log("Entered the second if!!")
+        this.props.setVisibility(false)
+    } 
   }
 
   private async CutHandler(event: React.MouseEvent<HTMLLIElement>) {
