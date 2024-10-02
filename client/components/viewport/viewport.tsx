@@ -11,7 +11,6 @@ import { IViewportContextMenuProps } from '../viewport-contextmenu/viewport-cont
 
 interface IViewportState {
   isFocused: boolean
-  selectedText: string
   viewportContextMenuProps: IViewportContextMenuProps
 }
 
@@ -27,7 +26,6 @@ class Viewport extends React.Component<any, IViewportState> {
     
     this.state = {
       isFocused: false,
-      selectedText: this.props.selectedElementText || 'GG',
       viewportContextMenuProps: {
         menuItems: [],
         isVisible: false,
