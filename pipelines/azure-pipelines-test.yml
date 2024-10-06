@@ -50,7 +50,7 @@ steps:
       pnpm test
     displayName: 'Run Tests'
     env:
-        DISPLAY: ':99.0'
+      DISPLAY: ':99.0'
         
   - task: PublishTestResults@2
     condition: always()
