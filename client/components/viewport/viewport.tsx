@@ -34,6 +34,7 @@ class Viewport extends React.Component<any, IViewportState> {
         onActionInvoked: this.props.onActionInvoked,
         selectedElementText: '',
         isSelectedElementEditable: false,
+        href: '',
       },
     }
     this.contextMenuRef = React.createRef<ViewportContextMenu>()

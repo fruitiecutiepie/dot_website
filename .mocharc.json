@@ -1,0 +1,8 @@
+{
+  "reporter": "mocha-junit-reporter",
+  "reporterOptions": {
+    "mochaFile": "reports/test-results.xml",
+    "testsuitesTitle": "VS Code Extension Tests"
+  },
+  "recursive": true
+}

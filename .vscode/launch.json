@@ -3,14 +3,7 @@
   "version": "0.1.0",
   "configurations": [
     {
-      "type": "chrome",
-      "request": "launch",
-      "name": "Launch Chrome",
-      "url": "http://localhost:3001",
-      "webRoot": "${workspaceFolder}"
-    },
-    {
-      "name": "Launch Extension",
+      "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -18,12 +11,32 @@
         "--extensionDevelopmentPath=${workspaceRoot}",
         "--disable-extensions"
       ],
-      "stopOnEntry": false,
       "sourceMaps": true,
       "outFiles": [
         "${workspaceRoot}/dist/extension.js"
       ],
       "preLaunchTask": "npm: build"
+    },
+    {
+			"name": "Test Extension",
+			"type": "extensionHost",
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionTestsPath=${workspaceFolder}/dist/test/index",
+        "--disable-extensions"
+			],
+			"outFiles": [
+				"${workspaceFolder}/dist/test/**/*.js"
+			],
+			"preLaunchTask": "npm: test"
+		},
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Launch Chrome",
+      "url": "http://localhost:3001",
+      "webRoot": "${workspaceFolder}"
     }
   ]
 }
