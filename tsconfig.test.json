@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist/test",
+    "rootDir": "test",
+    "strict": false,
+    "noEmit": false,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "target": "ES6",
+    "sourceMap": false
+  },
+  "include": ["test/**/*.ts"],
+  "exclude": ["node_modules", ".vscode-test"]
+}

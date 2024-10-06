@@ -14,7 +14,7 @@
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "noEmit": true,
-    "outDir": "build",
+    "outDir": "dist",
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -23,6 +23,13 @@
     "skipLibCheck": true
   },
   "include": [
-    "client"
+    "client",
+    "test"
+  ],
+  "exclude": [
+    "src",
+    "node_modules", 
+    ".vscode-test"
   ]
 }
+

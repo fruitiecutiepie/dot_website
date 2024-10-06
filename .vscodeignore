@@ -1,14 +1,16 @@
 .eslintignore
 .github
 .gitignore
-.vscode
-.yarnrc
-/index.html
-tsconfig.json
-vite.config.ts
-yarn.lock
+.vscode/**
+.vscode-test/**
 
-cleint/
-client/*
-src/*
+**/index.html
+**/tsconfig.json
+**/eslint.config.js
+**/vite.config.ts
+**/*.map
+**/*.ts
+
+client/**
+src/**
 node_modules/*

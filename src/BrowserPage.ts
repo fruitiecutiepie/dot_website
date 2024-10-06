@@ -42,6 +42,7 @@ export class BrowserPage extends EnhancedEventEmitter {
   }
 
   get id(): string {
+    // @ts-ignore
     return this.page.mainFrame()._id
   }
 

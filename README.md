@@ -13,6 +13,7 @@ Embedded file-based browser in VS Code
 </h1>
 
 > Forked from [Browser Preview](https://github.com/auchenberg/vscode-browser-preview) by [Kenneth Auchenberg](https://github.com/auchenberg)
+>
 > Forked from [Browse Lite](https://github.com/antfu/vscode-browse-lite) by [Anthony Fu](https://github.com/antfu)
 
 - ⚡️ Faster page refreshing

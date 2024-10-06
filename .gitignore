@@ -22,3 +22,5 @@ yarn-error.log*
 
 vars.css
 *.vsix
+.vscode/**
+.vscode-test/**

@@ -50,13 +50,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
     }
 
     diagnosticCollection.clear();
-  };
-
-  
-  vscode.workspace.onDidSaveTextDocument(async (doc) => {
-    lint_document(doc);
-  });
-      
+  };  
 
   ctx.subscriptions.push(
     diagnosticCollection,
