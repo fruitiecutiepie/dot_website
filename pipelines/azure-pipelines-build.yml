@@ -12,18 +12,15 @@ variables:
   PNPM_STORE_PATH: $(Pipeline.Workspace)/.pnpm-store  # Use a shared pnpm store path in the pipeline
 
 steps:
+- template: templates/cache-pnpm.yml
+  parameters:
+    pnpmLockFile: 'pnpm-lock.yaml'
+    storePath: '$(PNPM_STORE_PATH)'
+
 - task: UseNode@1
   inputs:
     version: '20.x'
   displayName: 'Install Node.js'
-
-- task: Cache@2
-  inputs:
-    key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
-    restoreKeys: |
-      pnpm | "$(Agent.OS)"
-    path: $(PNPM_STORE_PATH)  # Cache the pnpm store path
-  displayName: Cache pnpm store
 
 - script: |
     git config --global user.email "bot@dot-website.com"
@@ -50,12 +47,12 @@ steps:
 
     if [ "$(Build.Reason)" == "PullRequest" ]; then
       echo "This is a PR merge, incrementing minor version..."
-      bumpp minor --commit --tag --push false --commit "Bump minor version to %s [skip ci]" --yes
-      git push origin HEAD:$(Build.SourceBranchName)
+      bumpp minor --tag --push false --commit "chore: minor v%s [skip ci]" --yes
+      git push --force-with-lease origin HEAD:$(Build.SourceBranchName)
     else
       echo "Direct push to master, incrementing patch version..."
-      bumpp patch --commit --tag --push false --commit "Bump patch version to %s [skip ci]" --yes
-      git push origin HEAD:$(Build.SourceBranchName)
+      bumpp patch --tag --push false --commit "chore: patch v%s [skip ci]" --yes
+      git push --force-with-lease origin HEAD:$(Build.SourceBranchName)
     fi
     VERSION=$(node -p "require('./package.json').version")
     echo "##vso[task.setvariable variable=ExtensionVersion]$VERSION"

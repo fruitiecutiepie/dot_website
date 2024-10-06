@@ -1,0 +1,54 @@
+# pipelines/azure-pipelines-test.yml
+
+trigger:
+  branches:
+    include:
+      - '*'  # Triggers on push to any branch
+
+pr:
+  branches:
+    include:
+      - master  # Triggers on PRs targeting the 'main' branch
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  NODE_VERSION: '20.x'
+  PNPM_STORE_PATH: '$(Pipeline.Workspace)/.pnpm-store'
+
+steps:
+  - template: templates/cache-pnpm.yml
+    parameters:
+      pnpmLockFile: 'pnpm-lock.yaml'
+      storePath: '$(PNPM_STORE_PATH)'
+
+  - task: UseNode@1
+    inputs:
+      version: '$(NODE_VERSION)'
+    displayName: 'Install Node.js'
+
+  - script: |
+      npm install -g pnpm
+    displayName: 'Install pnpm'
+
+  - script: |
+      pnpm install --store-dir $(PNPM_STORE_PATH)
+    displayName: 'Install Dependencies'
+
+  - script: |
+      mkdir -p reports
+    displayName: 'Create Reports Directory'
+
+  - script: |
+      pnpm test
+    displayName: 'Run Tests'
+
+  - task: PublishTestResults@2
+    condition: always()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/reports/test-results.xml'
+      mergeTestResults: true
+      failTaskOnFailedTests: true
+    displayName: 'Publish Test Results'

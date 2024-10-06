@@ -1,0 +1,13 @@
+# pipelines/templates/cache-pnpm.yml
+parameters:
+  pnpmLockFile: 'pnpm-lock.yaml'
+  storePath: '$(Pipeline.Workspace)/.pnpm-store'
+
+steps:
+  - task: Cache@2
+    inputs:
+      key: 'pnpm | "$(Agent.OS)" | ${{ parameters.pnpmLockFile }}'
+      restoreKeys: |
+        pnpm | "$(Agent.OS)"
+      path: ${{ parameters.storePath }}
+    displayName: 'Cache pnpm store'
