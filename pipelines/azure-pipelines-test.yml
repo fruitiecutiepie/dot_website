@@ -46,7 +46,7 @@ steps:
     displayName: 'Install GPU and X11 Dependencies'
 
   - script: |
-      xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' pnpm test --no-sandbox
+      xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' pnpm test
     displayName: 'Run Tests with GPU Support'
 
   - task: PublishTestResults@2
