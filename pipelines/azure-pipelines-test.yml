@@ -46,8 +46,23 @@ steps:
     displayName: 'Install GPU and X11 Dependencies'
 
   - script: |
-      xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' pnpm test
-    displayName: 'Run Tests with GPU Support'
+      set -eux
+      # Start Xvfb server
+      /usr/bin/Xvfb :99 -screen 0 1024x768x24 &
+      sleep 1
+
+      # Ensure Xvfb is running
+      ps aux | grep Xvfb --color=always | grep -v grep
+
+      # Set display
+      export DISPLAY=:99.0
+
+      # Run tests
+      pnpm build:test && node ./dist/test/runTest.js --no-sandbox
+
+      # Kill Xvfb server
+      killall Xvfb
+    displayName: 'Run Tests with Xvfb and GPU Support'
 
   - task: PublishTestResults@2
     condition: always()
