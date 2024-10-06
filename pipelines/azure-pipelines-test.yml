@@ -39,19 +39,16 @@ steps:
   - script: |
       mkdir -p reports
     displayName: 'Create Reports Directory'
-
-  - bash: |
-      /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-      echo ">>> Started xvfb"
-    displayName: Start xvfb
-    condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
-    
-  - script: |
-      pnpm test
-    displayName: 'Run Tests'
-    env:
-      DISPLAY: ':99.0'
         
+  - script: |
+      sudo apt-get update
+      sudo apt-get install -y libgbm-dev libxss1 libasound2 libnss3 xvfb
+    displayName: 'Install GPU and X11 Dependencies'
+
+  - script: |
+      xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' pnpm test --no-sandbox
+    displayName: 'Run Tests with GPU Support'
+
   - task: PublishTestResults@2
     condition: always()
     inputs:
