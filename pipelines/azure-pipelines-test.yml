@@ -60,6 +60,9 @@ steps:
       # Run tests
       pnpm build && node ./dist/test/runTest.js --no-sandbox
 
+      # Run Jest Tests
+      pnpm test:jest 
+
       # Kill Xvfb server
       killall Xvfb
     displayName: 'Run Tests with Xvfb and GPU Support'
