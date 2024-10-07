@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import * as vscode from 'vscode';
-import { commands, debug, window } from 'vscode';
+import * as vscode from 'vscode'
+import { commands, debug, window } from 'vscode'
 
 import { DebugProvider } from './DebugProvider';
 import { PanelManager } from './PanelManager';
@@ -47,9 +47,9 @@ export const lint_document = async (
 export async function activate(ctx: vscode.ExtensionContext) {
   const manager = new PanelManager(ctx);
   const debugProvider = new DebugProvider(manager);
+  const diagnosticCollection = vscode.languages.createDiagnosticCollection('dot-website');
   
   let zoomLevel = 1.0; // Default zoom level
-  const diagnosticCollection = vscode.languages.createDiagnosticCollection('dot-website');
 
   
   ctx.subscriptions.push(
@@ -123,11 +123,8 @@ export async function activate(ctx: vscode.ExtensionContext) {
       const panel = await manager.current?.createDebugPanel();
       panel?.show();
     }),
-
-    commands.registerCommand('dot-website.controls.openSourceDocument', async (context?: Uri | TreeItem) => {
-      // NOTE: VS Code doesn't update resourceExtname context key correctly when a custom tree view 
-      // item is right-clicked, so we can't use it in package.json's context menu `when` clause
-      const uri = context instanceof TreeItem ? context.resourceUri : context;
+    commands.registerCommand('dot-website.controls.openSourceDocument', async (context?: vscode.Uri | vscode.TreeItem) => {
+      const uri = context instanceof vscode.TreeItem ? context.resourceUri : context;
       if (uri && uri.fsPath.endsWith('.website')) {
         await window.showTextDocument(uri);
         return;
@@ -138,17 +135,11 @@ export async function activate(ctx: vscode.ExtensionContext) {
     window.registerCustomEditorProvider('dot-website.editor', {
       async resolveCustomTextEditor(document, webviewPanel, token) {
         const line_count = document.lineCount; 
-        if (line_count === 0) {
+        if (line_count !== 1) {
           return;
         }
   
         let url = document.lineAt(0).text;
-        // const last_url = line_count >= 2 && document.lineAt(1).text;
-  
-        // if (last_url && last_url.startsWith('http')) {
-        //   url = last_url;
-        // }
-  
         try {
           await manager.createClient(url, webviewPanel, document);
         } catch (e) {
@@ -158,6 +149,51 @@ export async function activate(ctx: vscode.ExtensionContext) {
     }, {
       webviewOptions: {
         retainContextWhenHidden: true,
+      }
+    }),
+
+    // Register Zoom In command
+    commands.registerCommand('dot-website.controls.zoomIn', () => {
+      zoomLevel += 0.1; // Increment zoom level
+      manager.current?.postMessage({ command: 'zoom', zoom: zoomLevel });
+    }),
+
+    // Register Zoom Out command
+    commands.registerCommand('dot-website.controls.zoomOut', () => {
+      zoomLevel -= 0.1; // Decrease zoom level
+      if (zoomLevel < 0.1) zoomLevel = 0.1; // Prevent too much zoom out
+      manager.current?.postMessage({ command: 'zoom', zoom: zoomLevel });
+    }),
+
+    window.registerCustomEditorProvider(
+      'dot-website.editor',
+      {
+        async resolveCustomTextEditor(document, webviewPanel, token) {
+          const line_count = document.lineCount;
+          if (line_count === 0) {
+            return;
+          }
+
+          let url = document.lineAt(0).text;
+
+          try {
+            await manager.createClient(url, webviewPanel, document);
+          } catch (e) {
+            console.error(e);
+          }
+
+          // Handle zoom messages in the webview
+          webviewPanel.webview.onDidReceiveMessage((message) => {
+            if (message.command === 'zoom') {
+              webviewPanel.webview.postMessage({ command: 'zoom', zoom: message.zoom });
+            }
+          });
+        }
+      },
+      {
+        webviewOptions: {
+          retainContextWhenHidden: true,
+        }
       }
     ),
   );
@@ -169,8 +205,8 @@ export async function activate(ctx: vscode.ExtensionContext) {
       'dot-website.opener',
       {
         canOpenExternalUri: () => 2,
-        openExternalUri(resolveUri: Uri) {
-          manager.createClient(resolveUri)
+        openExternalUri(resolveUri: vscode.Uri) {
+          manager.createClient(resolveUri);
         },
       },
       {
@@ -179,6 +215,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
       },
     ));
   } catch { }
+  
 
   ctx.subscriptions.push(
     commands.registerCommand('dot-website.open_walkthrough', async () => {
