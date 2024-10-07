@@ -47,7 +47,11 @@ export const lint_document = async (
 export async function activate(ctx: vscode.ExtensionContext) {
   const manager = new PanelManager(ctx);
   const debugProvider = new DebugProvider(manager);
+  
+  let zoomLevel = 1.0; // Default zoom level
+  const diagnosticCollection = vscode.languages.createDiagnosticCollection('dot-website');
 
+  
   ctx.subscriptions.push(
     diagnosticCollection,
 
