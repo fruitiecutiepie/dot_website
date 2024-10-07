@@ -60,7 +60,7 @@ export const install_chromium = async (): Promise<[
   }
   console.log(`Installing Chromium for ${platform}...`);
   const [stdout, stderr] = await exec_command(
-    `npx puppeteer browsers install chrome-headless-shell@${VERSION} --path ${LOCAL_CHROMIUM_PATH} --platform ${platform}`,
+    `npx puppeteer@23.4.0 browsers install chrome-headless-shell@${VERSION} --path ${LOCAL_CHROMIUM_PATH} --platform ${platform}`,
   );
   if (stderr) {
     return [undefined, stderr];
