@@ -2,8 +2,27 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-suite('Linting Tests for .website Files', () => {
+// confirm locally vs remotely that
+//   1 extension activation timing
+//   2 diffs in exts or lang services
+//   3 document state, perhaps even wait 5s for things to render
+// try doing non headless or more flags
+//   try running the tests in a non-headless mode on the pipeline
+//   or use additional flags to simulate a more complete GUI environment if possible.
+
+suite('Linting Tests for .website Files', async () => {
   const testFilePath = path.join(__dirname, '..', '..', '..', 'test', 'fixtures', 'sample.website');
+
+  await vscode.languages.onDidChangeDiagnostics(() => {
+    console.log('Diagnostics changed');
+  });
+
+  const extension = vscode.extensions.getExtension('dot-website');
+  if (extension && !extension.isActive) {
+    await extension.activate();
+  }
+
+  console.log('Installed extensions:', vscode.extensions.all.map(ext => ext.id));
 
   test('Linting should report an error for multi-line content', async () => {
     const uri = vscode.Uri.file(testFilePath);
@@ -16,7 +35,9 @@ suite('Linting Tests for .website Files', () => {
     await vscode.workspace.applyEdit(edit);
     await document.save();
 
+    await new Promise(resolve => setTimeout(resolve, 1000));
     const diagnostics = vscode.languages.getDiagnostics(document.uri);
+    console.log('diagnostics 1', diagnostics);
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].message, 'File should only contain one line.');
   });
@@ -32,7 +53,9 @@ suite('Linting Tests for .website Files', () => {
     await vscode.workspace.applyEdit(edit);
     await document.save();
 
+    await new Promise(resolve => setTimeout(resolve, 1000));
     const diagnostics = vscode.languages.getDiagnostics(document.uri);
+    console.log('diagnostics 2', diagnostics);
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].message, "Invalid URL: Must start with 'http://' or 'https://' and contain a valid address.");
   });
@@ -48,7 +71,9 @@ suite('Linting Tests for .website Files', () => {
     await vscode.workspace.applyEdit(edit);
     await document.save();
 
+    await new Promise(resolve => setTimeout(resolve, 1000));
     const diagnostics = vscode.languages.getDiagnostics(document.uri);
+    console.log('diagnostics 3', diagnostics);
     assert.strictEqual(diagnostics.length, 0);
   });
 });
