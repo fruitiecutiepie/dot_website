@@ -9,7 +9,11 @@ async function runTest() {
 		// The path to the extension test script
 		const extensionTestsPath = path.resolve(__dirname, './suite/index');
 		
-		const exitCode = await runTests({ extensionDevelopmentPath, extensionTestsPath });
+		const exitCode = await runTests({
+			extensionDevelopmentPath,
+			extensionTestsPath,
+			launchArgs: ['--disable-gpu'],
+		});
 		process.exit(exitCode);
 	} catch (err) {
 		console.error('Failed to run tests');
