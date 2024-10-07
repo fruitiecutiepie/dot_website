@@ -13,45 +13,50 @@ import { PanelManager } from './PanelManager'
 // TODO: add ctrl+A to select all
 // TODO: maybe move open source document to horizontal split and context menu
 
+// Visible for Testing
+export const lint_document = async (
+  doc: vscode.TextDocument,
+  diagnosticCollection: vscode.DiagnosticCollection
+) => {
+  const text = doc.getText();
+  const lines = text.split('\n');
+
+  if (lines.length === 0) {
+    return;
+  }
+
+  if (lines.length !== 1) {
+    const range = new vscode.Range(1, 0, 1, 0);
+    const diagnostic = new vscode.Diagnostic(
+      range,
+      'File should only contain one line.',
+      vscode.DiagnosticSeverity.Error
+    );
+    diagnosticCollection.set(doc.uri, [diagnostic]);
+    return;
+  }
+  
+  const urlRegex = /^(https?:\/\/(www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(:[0-9]{1,5})?(\/[^\s]*)?)$/;
+  if (!urlRegex.test(lines[0])) {
+    const range = new vscode.Range(0, 0, 0, lines[0].length);
+    const diagnostic = new vscode.Diagnostic(
+      range,
+      `Invalid URL: Must start with 'http://' or 'https://' and contain a valid address.`,
+      vscode.DiagnosticSeverity.Error
+    );
+    diagnosticCollection.set(doc.uri, [diagnostic]);
+    return;
+  }
+
+  diagnosticCollection.clear();
+};  
+
 export async function activate(ctx: vscode.ExtensionContext) {
   const manager = new PanelManager(ctx);
   const debugProvider = new DebugProvider(manager);
   const diagnosticCollection = vscode.languages.createDiagnosticCollection('dot-website');
 
-  const lint_document = async (doc: vscode.TextDocument) => {
-    const text = doc.getText();
-    const lines = text.split('\n');
-
-    if (lines.length === 0) {
-      return;
-    }
-
-    if (lines.length !== 1) {
-      const range = new vscode.Range(1, 0, 1, 0);
-      const diagnostic = new vscode.Diagnostic(
-        range,
-        'File should only contain one line.',
-        vscode.DiagnosticSeverity.Error
-      );
-      diagnosticCollection.set(doc.uri, [diagnostic]);
-      return;
-    }
-    
-    const urlRegex = /^(https?:\/\/(www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(:[0-9]{1,5})?(\/[^\s]*)?)$/;
-    if (!urlRegex.test(lines[0])) {
-      const range = new vscode.Range(0, 0, 0, lines[0].length);
-      const diagnostic = new vscode.Diagnostic(
-        range,
-        `Invalid URL: Must start with 'http://' or 'https://' and contain a valid address.`,
-        vscode.DiagnosticSeverity.Error
-      );
-      diagnosticCollection.set(doc.uri, [diagnostic]);
-      return;
-    }
-
-    diagnosticCollection.clear();
-  };  
-
+  
   ctx.subscriptions.push(
     diagnosticCollection,
 
@@ -72,13 +77,13 @@ export async function activate(ctx: vscode.ExtensionContext) {
       if (doc.languageId !== 'dot-website') {
         return;
       }
-      lint_document(doc);
+      lint_document(doc, diagnosticCollection);
     }),
     vscode.workspace.onDidChangeTextDocument(async (e) => {
       if (e.document.languageId !== 'dot-website') {
         return;
       }
-      lint_document(e.document);
+      lint_document(e.document, diagnosticCollection);
     }),
 
     commands.registerCommand('dot-website.open', async (url?: string | vscode.Uri) => {

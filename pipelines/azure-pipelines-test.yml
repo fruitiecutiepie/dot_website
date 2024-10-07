@@ -58,7 +58,7 @@ steps:
       export DISPLAY=:99.0
 
       # Run tests
-      pnpm build:test && node ./dist/test/runTest.js --no-sandbox
+      pnpm build && node ./dist/test/runTest.js --no-sandbox
 
       # Kill Xvfb server
       killall Xvfb

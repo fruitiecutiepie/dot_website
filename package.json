@@ -376,7 +376,7 @@
     "install_extension": "pnpm build && pnpm package && node install_extension.js",
     "lint": "eslint .",
     "release": "bumpp",
-    "test": "pnpm build:test && node ./dist/test/runTest.js"
+    "test": "pnpm build && node ./dist/test/runTest.js"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^1.0.0-beta.27",
