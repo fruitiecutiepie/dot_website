@@ -12,14 +12,14 @@ import type {
 type OnActionInvokedType = (action: string, data?: object) => Promise<any>;
 
 describe('ViewportContextMenu', () => {
-  test('CopyLinkHandler copies link to clipboard and hides context menu', async () => {
+  test('CopyLinkHandler copies full link to clipboard', async () => {
     const mockOnActionInvoked: jest.MockedFunction<OnActionInvokedType> = jest.fn<OnActionInvokedType>().mockResolvedValue('mocked value');
     const { getByText } = render(
       <ViewportContextMenu 
         onActionInvoked={mockOnActionInvoked}
         setVisibility={jest.fn()}
         selectedElementText="Sample Text"
-        href="https://example.com"
+        href="https://example.com/SamplePath/SamplePage"
         menuItems={[]}
         isVisible={true}
         position={{ x: 0, y: 0 }}
@@ -43,8 +43,35 @@ describe('ViewportContextMenu', () => {
 
     // Assertions
     expect(mockOnActionInvoked).toHaveBeenCalledWith('writeClipboard', {
-      value: 'https://example.com',
+      value: 'https://example.com/SamplePath/SamplePage',
     });
     // expect(instance.state.isVisible).toBe(false);
+  });
+
+  test('CopyLinkDomainHandler copies only domain part of the link to clipboard', async () => {
+    const mockOnActionInvoked: jest.MockedFunction<OnActionInvokedType> = jest.fn<OnActionInvokedType>().mockResolvedValue('mocked value');
+    const { getByText } = render(
+      <ViewportContextMenu 
+        onActionInvoked={mockOnActionInvoked}
+        setVisibility={jest.fn()}
+        selectedElementText="Sample Text"
+        href="https://example.com/SamplePath/SamplePage"
+        menuItems={[]}
+        isVisible={true}
+        position={{ x: 0, y: 0 }}
+        selectedElementUid="sample-uid"
+        isSelectedElementEditable={false}
+      />
+    );
+
+    await act(async () => {
+      fireEvent.click(getByText('Copy Link (Domain)'));
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(mockOnActionInvoked).toHaveBeenCalledWith('writeClipboard', {
+      value: 'https://example.com',
+    });
   });
 });
