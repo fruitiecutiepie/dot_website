@@ -23,6 +23,16 @@
   ],
   "contributes": {
     "commands": [
+      { 
+        "category": "Dot Website",
+        "command": "dot-website.openLinkInNewTab",
+        "title": "Open Link in New Tab"
+      },
+      { 
+        "category": "Dot Website",
+        "command": "dot-website.openMultipleLinksInNewTabs",
+        "title": "Open Multiple Links in New Tabs"
+      },
       {
         "category": "Dot Website",
         "command": "dot-website.open",
@@ -63,6 +73,15 @@
         "title": "Run .website Document",
         "icon": "$(run)"
       }
+    ],
+    "keybindings": [
+      {
+        "command": "dot-website.openLinkInNewTab",
+        "key": "ctrl+shift+n",
+        "mac": "cmd+shift+n",
+        "when": "editorHasSelection && editorTextFocus"
+      }
+  
     ],
     "configuration": {
       "title": "Dot Website",
@@ -281,6 +300,11 @@
           "when": "!explorerResourceIsFolder && resourceExtname == .website",
           "command": "dot-website.controls.openSourceDocument",
           "group": "dot-website"
+        },
+        {
+          "command": "dot-website.openLinkInNewTab",
+          "when": "editorHasSelection && editorTextFocus",
+          "group": "navigation"
         }
       ],
       "editor/title": [

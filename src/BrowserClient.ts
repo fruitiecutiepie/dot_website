@@ -16,9 +16,50 @@ import { install_chromium } from '../install_chromium'
 
 export class BrowserClient extends EventEmitter {
   private browser: Browser | undefined
+  private selectedLinks: string[] = [];
 
   constructor(private config: ExtensionConfiguration, private ctx: ExtensionContext) {
     super()
+  }
+
+  // Modified: Open selected links in new tabs instead of new windows
+  public async openLinkInNewTab(link: string): Promise<void> {
+    if (!this.browser) {
+      await this.launchBrowser(); // Launch the browser if it's not already running
+    }
+
+    const page = await this.browser!.newPage(); // Open in a new tab (not a new window)
+    await page.goto(link, { waitUntil: 'load' });
+
+   window.showInformationMessage(`Opened link in a new tab: ${link}`);
+  }
+
+  // Method to handle multiple link selections (Ctrl + Click)
+  public async openMultipleLinksInNewTabs(): Promise<void> {
+    if (this.selectedLinks.length === 0) {
+    window.showWarningMessage('No links selected to open.');
+      return;
+    }
+
+    for (const link of this.selectedLinks) {
+      await this.openLinkInNewTab(link); // Open each link in a new tab
+    }
+
+    this.clearSelectedLinks(); // Clear the selection after opening links
+  }
+
+  // Store links when Ctrl + Click is detected
+  public handleLinkSelection(event: MouseEvent, link: string) {
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault(); // Prevent default browser behavior
+      this.selectedLinks.push(link); // Store the selected link
+      window.showInformationMessage(`Link selected: ${link}`);
+    }
+  }
+
+  // Clear the selected links after opening them
+  private clearSelectedLinks(): void {
+    this.selectedLinks = [];
   }
 
   private async launchBrowser() {
@@ -79,7 +120,7 @@ export class BrowserClient extends EventEmitter {
     // close the initial empty page
     ; (await this.browser.pages()).map(i => i.close())
   }
-
+    
   public async newPage(): Promise<BrowserPage> {
     if (!this.browser) {
       await this.launchBrowser();

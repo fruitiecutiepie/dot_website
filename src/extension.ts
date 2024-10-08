@@ -56,10 +56,45 @@ export async function activate(ctx: vscode.ExtensionContext) {
   const debugProvider = new DebugProvider(manager);
   const diagnosticCollection = vscode.languages.createDiagnosticCollection('dot-website');
 
-  
+  let disposable = vscode.commands.registerCommand('dot-website.openMultipleLinksInNewWindows', async () => {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      vscode.window.showErrorMessage('No editor is active.');
+      return;
+    }
+
+    const selection = editor.selection;
+    const selectedText = editor.document.getText(selection);
+    const links = selectedText.split('\n').filter(link => link.trim() !== '');
+
+    links.forEach(link => {
+      const panel = vscode.window.createWebviewPanel(
+        'dotWebsite',
+        `New Window: ${link}`,
+        vscode.ViewColumn.Beside,
+        { enableScripts: true } // Options to enable scripts
+
+        
+      );
+      panel.webview.html = getWebviewContent(link);
+      panel.webview.onDidReceiveMessage((message) => {
+        if (message.command === 'openLink') {
+          const newPanel = vscode.window.createWebviewPanel(
+            'dotWebsite',
+            `New Window: ${message.link}`,
+            vscode.ViewColumn.Beside,
+            { enableScripts: true }
+          );
+          newPanel.webview.html = getWebviewContent(message.link);
+        }
+      });
+    });
+  });
+    // Add the command to the context subscriptions
+  ctx.subscriptions.push(disposable);
+
   ctx.subscriptions.push(
     diagnosticCollection,
-
     debug.registerDebugConfigurationProvider(
       'dot-website',
       debugProvider.getProvider(),
@@ -86,6 +121,71 @@ export async function activate(ctx: vscode.ExtensionContext) {
       lint_document(e.document, diagnosticCollection);
     }),
 
+    debug.registerDebugConfigurationProvider(
+      'dot-website',
+      debugProvider.getProvider(),
+    ),
+
+    vscode.workspace.onDidSaveTextDocument(async (doc) => {
+      if (doc.uri.fsPath.endsWith('.website')) {
+        const buffer = await vscode.workspace.fs.readFile(doc.uri);
+        const url = buffer.toString().trim().split('\n')[0];
+        manager.current?.navigateTo(url);
+        manager.current?.setPinnedUrl(url);
+      }
+    }),
+    vscode.workspace.onDidOpenTextDocument(async (doc) => {
+      if (doc.languageId !== 'dot-website') {
+        return;
+      }
+      lint_document(doc, diagnosticCollection);
+    }),
+    vscode.workspace.onDidChangeTextDocument(async (e) => {
+      if (e.document.languageId !== 'dot-website') {
+        return;
+      }
+      lint_document(e.document, diagnosticCollection);
+    }),
+    
+    commands.registerCommand('dot-website.openLinkInNewTab', async () => {
+      const editor = vscode.window.activeTextEditor;
+
+      if (editor) {
+        const selection = editor.selection;
+        const selectedText = editor.document.getText(selection);
+
+        if (selectedText.startsWith('http')) {
+          await manager.createClient(selectedText);  // Opens the link in the Dot Website extension
+          vscode.window.showInformationMessage(`Opened link: ${selectedText} in a new tab.`);
+        } else {
+          vscode.window.showWarningMessage('Selected text is not a valid URL.');
+        }
+      } else {
+        vscode.window.showWarningMessage('No editor is active.');
+      }
+    }),
+    
+        commands.registerCommand('dot-website.openMultipleLinksInNewTabs', async () => {
+      const editor = vscode.window.activeTextEditor;
+
+      if (editor) {
+        const selection = editor.selection;
+        const selectedText = editor.document.getText(selection);
+
+        // Add logic here to open multiple links if needed, assuming text contains multiple URLs
+        const links = selectedText.split(/\s+/);  // Example: split links by whitespace
+
+        for (const link of links) {
+          if (link.startsWith('http')) {
+            await manager.createClient(link);
+          } else {
+            vscode.window.showWarningMessage(`Invalid URL: ${link}`);
+          }
+        }
+        vscode.window.showInformationMessage('Opened multiple links in new tabs.');
+      }
+    })
+  );
     commands.registerCommand('dot-website.open', async (url?: string | vscode.Uri) => {
       try {
         return await manager.createClient(url);
@@ -93,6 +193,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
         console.error(e);
       }
     }),
+   
     commands.registerCommand('dot-website.controls.runDocument', async () => {
       const document = window.activeTextEditor?.document;
       if (!document) {
@@ -157,8 +258,8 @@ export async function activate(ctx: vscode.ExtensionContext) {
       webviewOptions: {
         retainContextWhenHidden: true,
       }
-    }),
-  );
+    });
+  
 
   try {
     // https://code.visualstudio.com/updates/v1_53#_external-uri-opener
@@ -238,4 +339,29 @@ export async function activate(ctx: vscode.ExtensionContext) {
     await commands.executeCommand('dot-website.notifications.extension_updated');
 		await ctx.globalState.update('lastVersion', currentVersion);
   }
+}
+function getWebviewContent(link: string): string {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${link}</title>
+      <script>
+        document.addEventListener('click', (event) => {
+          const target = event.target;
+          if (target.tagName === 'A' && target.href.startsWith('http')) {
+            event.preventDefault();
+            const vscode = acquireVsCodeApi();
+            vscode.postMessage({ command: 'openLink', link: target.href });
+          }
+        });
+      </script>
+    </head>
+    <body>
+      <iframe src="${link}" style="width:100%; height:100vh; border:none;" sandbox="allow-scripts allow-same-origin"></iframe>
+    </body>
+    </html>
+  `;
 }
