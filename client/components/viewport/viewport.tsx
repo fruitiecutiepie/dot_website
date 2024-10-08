@@ -23,6 +23,7 @@ class Viewport extends React.Component<any, IViewportState> {
 
   constructor(props: any) {
     super(props)
+    
     this.state = {
       isFocused: false,
       viewportContextMenuProps: {
@@ -32,11 +33,11 @@ class Viewport extends React.Component<any, IViewportState> {
         position: { x: 0, y: 0 },
         setVisibility: this.setVisibility.bind(this),
         onActionInvoked: this.props.onActionInvoked,
-        selectedElementText: '',
+        selectedElementText:'',
         isSelectedElementEditable: false,
         href: '',
       },
-    }
+    }  
     this.contextMenuRef = React.createRef<ViewportContextMenu>()
     this.viewportRef = React.createRef<HTMLDivElement>()
     this.viewportPadding = {
@@ -56,6 +57,7 @@ class Viewport extends React.Component<any, IViewportState> {
     this.handleResizeStop = this.handleResizeStop.bind(this)
     this.handleMouseMoved = this.handleMouseMoved.bind(this)
     this.onActionInvoked = this.props.onActionInvoked.bind(this)
+    this.handleContextMenu = this.handleContextMenu.bind(this)
   }
 
   public componentDidMount() {
@@ -101,6 +103,8 @@ class Viewport extends React.Component<any, IViewportState> {
       <div
         className={`viewport ${this.props.isDeviceEmulationEnabled ? 'viewport-resizable' : ''}`}
         ref={this.viewportRef}
+        onContextMenu={this.handleContextMenu}
+        // onContextMenu={this.handleContextMenu}
       >
       <Loading percent={viewport.loadingPercent} />
       {
@@ -131,7 +135,7 @@ class Viewport extends React.Component<any, IViewportState> {
                 topRight: 'viewport-resizer resizer-top-right',
                 topLeft: 'viewport-resizer resizer-top-left',
             }}
-            >                
+            >    
               <Screencast
                 height={height}
                 width={width}
@@ -149,10 +153,30 @@ class Viewport extends React.Component<any, IViewportState> {
           </>
         )
       }
-      <ViewportContextMenu ref={this.contextMenuRef} {...this.state.viewportContextMenuProps} />
+      <ViewportContextMenu ref={this.contextMenuRef} {...this.state.viewportContextMenuProps}  />
       </div>
     )
   }
+
+    private handleContextMenu = (e: React.MouseEvent) => {
+      // const selection = window.getSelection();
+      // const selectedText = selection?.toString();
+      // const selectedText = this.contextMenuRef.current?.state.selectedElementText;
+      // console.log("Selected:" + this.state.selectedText);
+        e.preventDefault(); 
+        const viewportOffsetTop = this.viewportRef.current?.getBoundingClientRect().top ?? 0;
+        this.setState({
+            viewportContextMenuProps: {
+                ...this.state.viewportContextMenuProps,
+                isVisible: true,
+                position: { 
+                  x: e.clientX, 
+                  y: e.clientY - viewportOffsetTop,
+                }, 
+                // selectedElementText: selectedText, // Pass the selected text to the context menu
+            },
+        });
+    };
 
   public setVisibility(value: boolean) {
     this.setState({

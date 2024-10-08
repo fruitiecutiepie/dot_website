@@ -32,6 +32,7 @@ export enum ViewportContextMenuItemsType {
   Paste = 'Paste',
   SelectAll = 'Select All',
   CopyLink = 'Copy Link',
+  CopyLinkDomain = 'Copy Link (Domain)',
   Separator = '-',
 }
 

@@ -55,6 +55,11 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
           setVisibility: this.props.setVisibility,
           handleClick: e => this.CopyLinkHandler(e),
         },
+        {
+          itemType: ViewportContextMenuItemsType.CopyLinkDomain, // Added Copy Link Domain option
+          setVisibility: this.props.setVisibility,
+          handleClick: e => this.CopyLinkDomainHandler(e),
+        },
       ],
     }
 
@@ -103,10 +108,18 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
     }
     if (nextProps.selectedElementText !== this.state.selectedElementText) {
       this.setState({
-        selectedElementText: nextProps.selectedElementText,
+        selectedElementText: this.state.selectedElementText,    //** 
       })
       this.manageMenuItemsStatus()
     }
+
+    if (nextProps.href !== this.state.href) {
+      this.setState({
+        href: this.state.href, 
+      })
+      this.manageMenuItemsStatus()
+    }
+
     if (nextProps.isVisible !== this.state.isVisible) {
       this.setState({
         isVisible: nextProps.isVisible,
@@ -192,28 +205,42 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
       }
     }
 
-    // Enable/disable Copy Link 
+    // Enable/disable Copy Link and Copy Link (Domain)
     const copyLink = this.state.menuItems.find(
       x => x.itemType === ViewportContextMenuItemsType.CopyLink,
     )
     const copyLinkIndex = this.state.menuItems.findIndex(
       x => x.itemType === ViewportContextMenuItemsType.CopyLink,
     )
+
+    const copyDomain = this.state.menuItems.find(
+      x => x.itemType === ViewportContextMenuItemsType.CopyLinkDomain,
+    )
+    const copyDomainIndex = this.state.menuItems.findIndex(
+      x => x.itemType === ViewportContextMenuItemsType.CopyLinkDomain,
+    )
     
     const linkLength = this.state.href?.length;
-    if (copyLinkIndex === -1) {  
+    if (copyLinkIndex === -1 || copyDomainIndex === -1) {  
       return;  
     }  
     
-    if (!linkLength) {  
-      _menuItems[copyLinkIndex].isDisabled = true;  
-      this.setState({menuItems: _menuItems});  
-      return;  
-    }  
-    
-    _menuItems[copyLinkIndex].isDisabled = false;  
-    this.setState({menuItems: _menuItems});  
-    return; 
+    // Enable/disable Copy Link option
+    if (!linkLength) {
+      _menuItems[copyLinkIndex].isDisabled = true;
+    } else {
+      _menuItems[copyLinkIndex].isDisabled = false;
+    }
+
+    // Enable/disable Copy Link Domain option
+    if (!linkLength) {
+      _menuItems[copyDomainIndex].isDisabled = true;
+    } else {
+      _menuItems[copyDomainIndex].isDisabled = false;
+    }
+
+    this.setState({ menuItems: _menuItems });
+      
   }
 
   public render() {
@@ -240,8 +267,12 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
   }
 
   public handleClickOutside(e: MouseEvent) {
-    if (this.ref && !this.ref.contains(e.target as Node))
-      this.props.setVisibility(false)
+    // console.log("REF: ", this.ref)
+    // console.log("Target: ", e.target)
+    if (this.ref && !this.ref.contains(e.target as Node)){
+      // console.log("Entered the second if!!")
+        this.props.setVisibility(false)
+    } 
   }
 
   private async CutHandler(event: React.MouseEvent<HTMLLIElement>) {
@@ -303,6 +334,32 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
     if (this.props.onActionInvoked && this.state.href) {
       await this.props.onActionInvoked('writeClipboard', {
         value: this.state.href,
+      })
+      this.setState({
+        isVisible: false,
+      })
+    }
+  }
+
+  private async CopyLinkDomainHandler(event: React.MouseEvent<HTMLLIElement>) {
+    if (this.props.onActionInvoked && this.state.href) {
+      const fullUrl = this.state.href;
+      let link = '';
+      try{
+        const url = new URL(fullUrl);
+    
+        // Extract the main domain
+        const mainDomain = `${url.protocol}//${url.hostname}`;
+
+        //Include the port number if present
+        link = url.port ? `${mainDomain}:${url.port}` : mainDomain;
+        
+      }catch(error){
+        console.error('Invalid URL:', error);
+      }
+
+      await this.props.onActionInvoked('writeClipboard', {
+        value: link,
       })
       this.setState({
         isVisible: false,

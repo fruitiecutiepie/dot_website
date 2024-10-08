@@ -56,7 +56,7 @@ class Screencast extends React.Component<any, any> {
         onKeyUp={this.handleKeyEvent}
         onKeyPress={this.handleKeyEvent}
         onContextMenu={this.handleContextMenu}
-        tabIndex={0}
+        tabIndex={-1}
       />
     )
   }
@@ -66,7 +66,7 @@ class Screencast extends React.Component<any, any> {
   }
 
   private handleMouseEvent(event: React.MouseEvent<HTMLImageElement>) {
-    event.stopPropagation()
+    // event.stopPropagation()
     if (this.props.isInspectEnabled) {
       if (event.type === 'click') {
         const position = this.convertIntoScreenSpace(event, this.state)
