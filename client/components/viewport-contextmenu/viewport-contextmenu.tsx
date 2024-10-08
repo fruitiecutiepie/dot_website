@@ -23,6 +23,8 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
       isSelectedElementEditable: false,
       href: this.props.href,
       
+      href: this.props.href,
+      
       // assign menuItems
       menuItems: [
         {
