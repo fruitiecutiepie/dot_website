@@ -164,38 +164,6 @@ export async function activate(ctx: vscode.ExtensionContext) {
       if (zoomLevel < 0.1) zoomLevel = 0.1; // Prevent too much zoom out
       manager.current?.postMessage({ command: 'zoom', zoom: zoomLevel });
     }),
-
-    window.registerCustomEditorProvider(
-      'dot-website.editor',
-      {
-        async resolveCustomTextEditor(document, webviewPanel, token) {
-          const line_count = document.lineCount;
-          if (line_count === 0) {
-            return;
-          }
-
-          let url = document.lineAt(0).text;
-
-          try {
-            await manager.createClient(url, webviewPanel, document);
-          } catch (e) {
-            console.error(e);
-          }
-
-          // Handle zoom messages in the webview
-          webviewPanel.webview.onDidReceiveMessage((message) => {
-            if (message.command === 'zoom') {
-              webviewPanel.webview.postMessage({ command: 'zoom', zoom: message.zoom });
-            }
-          });
-        }
-      },
-      {
-        webviewOptions: {
-          retainContextWhenHidden: true,
-        }
-      }
-    ),
   );
 
   try {
