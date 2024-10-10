@@ -258,13 +258,13 @@ export class BrowserPage extends EnhancedEventEmitter {
   });
 
   // Listen for zoom messages from the extension (if necessary)
-  window.addEventListener('message', (event) => {
-    const message = event.data;
-    if (message.command === 'zoom') {
-      window.zoomLevel = message.zoom;
-      document.body.style.zoom = window.zoomLevel.toString();
-    }
-  });
+  // window.addEventListener('message', (event) => {
+  //   const message = event.data;
+  //   if (message.command === 'zoom') {
+  //     window.zoomLevel = message.zoom;
+  //     document.body.style.zoom = window.zoomLevel.toString();
+  //   }
+  // });
       // custom embedded devtools
       localStorage.setItem('screencastEnabled', 'false')
       localStorage.setItem('panel-selectedTab', 'console')
