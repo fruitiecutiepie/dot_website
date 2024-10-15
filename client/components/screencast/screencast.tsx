@@ -56,7 +56,7 @@ class Screencast extends React.Component<any, any> {
         onKeyUp={this.handleKeyEvent}
         onKeyPress={this.handleKeyEvent}
         onContextMenu={this.handleContextMenu}
-        tabIndex={-1}
+        tabIndex={0}
       />
     )
   }

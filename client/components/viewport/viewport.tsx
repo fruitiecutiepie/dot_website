@@ -104,7 +104,6 @@ class Viewport extends React.Component<any, IViewportState> {
         className={`viewport ${this.props.isDeviceEmulationEnabled ? 'viewport-resizable' : ''}`}
         ref={this.viewportRef}
         onContextMenu={this.handleContextMenu}
-        // onContextMenu={this.handleContextMenu}
       >
       <Loading percent={viewport.loadingPercent} />
       {
@@ -159,10 +158,6 @@ class Viewport extends React.Component<any, IViewportState> {
   }
 
     private handleContextMenu = (e: React.MouseEvent) => {
-      // const selection = window.getSelection();
-      // const selectedText = selection?.toString();
-      // const selectedText = this.contextMenuRef.current?.state.selectedElementText;
-      // console.log("Selected:" + this.state.selectedText);
         e.preventDefault(); 
         const viewportOffsetTop = this.viewportRef.current?.getBoundingClientRect().top ?? 0;
         this.setState({
@@ -173,7 +168,6 @@ class Viewport extends React.Component<any, IViewportState> {
                   x: e.clientX, 
                   y: e.clientY - viewportOffsetTop,
                 }, 
-                // selectedElementText: selectedText, // Pass the selected text to the context menu
             },
         });
     };

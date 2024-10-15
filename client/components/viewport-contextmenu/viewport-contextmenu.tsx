@@ -58,7 +58,7 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
         {
           itemType: ViewportContextMenuItemsType.CopyLinkDomain, // Added Copy Link Domain option
           setVisibility: this.props.setVisibility,
-          handleClick: e => this.CopyLinkDomainHandler(e),
+          handleClick: e => this.copyLinkDomainHandler(e),
         },
       ],
     }
@@ -108,7 +108,7 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
     }
     if (nextProps.selectedElementText !== this.state.selectedElementText) {
       this.setState({
-        selectedElementText: this.state.selectedElementText,    //** 
+        selectedElementText: this.state.selectedElementText,
       })
       this.manageMenuItemsStatus()
     }
@@ -206,16 +206,10 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
     }
 
     // Enable/disable Copy Link and Copy Link (Domain)
-    const copyLink = this.state.menuItems.find(
-      x => x.itemType === ViewportContextMenuItemsType.CopyLink,
-    )
     const copyLinkIndex = this.state.menuItems.findIndex(
       x => x.itemType === ViewportContextMenuItemsType.CopyLink,
     )
 
-    const copyDomain = this.state.menuItems.find(
-      x => x.itemType === ViewportContextMenuItemsType.CopyLinkDomain,
-    )
     const copyDomainIndex = this.state.menuItems.findIndex(
       x => x.itemType === ViewportContextMenuItemsType.CopyLinkDomain,
     )
@@ -341,11 +335,11 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
     }
   }
 
-  private async CopyLinkDomainHandler(event: React.MouseEvent<HTMLLIElement>) {
+  private async copyLinkDomainHandler(event: React.MouseEvent<HTMLLIElement>) {
     if (this.props.onActionInvoked && this.state.href) {
       const fullUrl = this.state.href;
       let link = '';
-      try{
+      try {
         const url = new URL(fullUrl);
     
         // Extract the main domain
@@ -354,7 +348,7 @@ class ViewportContextMenu extends React.Component<IViewportContextMenuProps, IVi
         //Include the port number if present
         link = url.port ? `${mainDomain}:${url.port}` : mainDomain;
         
-      }catch(error){
+      } catch (error) { 
         console.error('Invalid URL:', error);
       }
 
