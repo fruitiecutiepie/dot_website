@@ -13,15 +13,33 @@ pool:
 
 variables:
   NODE_VERSION: '20.x'
+  PNPM_STORE_PATH: '$(Pipeline.Workspace)/.pnpm-store'
 
 steps:
+  - template: templates/cache-pnpm.yml
+    parameters:
+      pnpmLockFile: 'pnpm-lock.yaml'
+      storePath: '$(PNPM_STORE_PATH)'
+
   - task: UseNode@1
     inputs:
       version: '$(NODE_VERSION)'
     displayName: 'Install Node.js'
 
   - script: |
+      npm install -g pnpm
+    displayName: 'Install pnpm'
+
+  - script: |
+      pnpm install --store-dir $(PNPM_STORE_PATH)
+    displayName: 'Install Dependencies'
+  
+  - script: |
+      pnpm build
+    displayName: 'Build and package VSIX file'
+
+  - script: |
       npm install -g vsce
       vsce package --no-dependencies --allow-missing-repository
-      vsce publish --no-dependencies --allow-missing-repository -p $(GITHUB_TOKEN)
+      vsce publish --no-dependencies --allow-missing-repository -p $(GITHUB_TOKEN) --skip-duplicate
     displayName: 'Publish to VS Code Marketplace'
