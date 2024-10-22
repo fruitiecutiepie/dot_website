@@ -1,0 +1,27 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  NODE_VERSION: '20.x'
+
+steps:
+  - task: UseNode@1
+    inputs:
+      version: '$(NODE_VERSION)'
+    displayName: 'Install Node.js'
+
+  - script: |
+      npm install -g vsce
+      vsce package
+      vsce publish -p $(GITHUB_TOKEN)
+    displayName: 'Publish to VS Code Marketplace'
