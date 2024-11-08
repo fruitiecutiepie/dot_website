@@ -27,11 +27,6 @@
         "command": "dot-website.open",
         "key": "ctrl+t",
         "mac": "cmd+shift+t"
-      },
-      {
-        "command": "dot-website.open",
-        "key": "ctrl+click",
-        "mac": "cmd+shift+click"
       }
     ],
     "commands": [

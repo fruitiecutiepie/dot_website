@@ -86,6 +86,11 @@ export class Panel extends EventEmitter2 {
         this.browserPage.on('extension.click', async (data: any) => {
           this.postMessage('extension.click', data)
         })
+        this.browserPage.on('extension.openNewTab', async (data: any) => {
+          console.log('extension.openNewTab data', JSON.stringify(data, null, 2));
+          commands.executeCommand('dot-website.open', data.url);
+        })
+
 
         this.browserPage.else(async (data: any) => {
           if (this._panel) {
