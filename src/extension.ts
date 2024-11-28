@@ -3,15 +3,8 @@ import path from 'path';
 import * as vscode from 'vscode'
 import { commands, debug, window } from 'vscode'
 
-import { DebugProvider } from './DebugProvider'
-import { PanelManager } from './PanelManager'
-
-// TODO: Ctrl+F to search, Ctrl+R to reload page, Ctrl+Shift+C to open DevTools
-// TODO: google signin, etc.
-// TODO: right click to open in new tab, copy, paste, etc.
-// TODO: ctrl+- page. ctrl+up/down to scroll, ctrl+z to undo, ctrl+shift+z to redo
-// TODO: add ctrl+A to select all
-// TODO: maybe move open source document to horizontal split and context menu
+import { DebugProvider } from './DebugProvider';
+import { PanelManager } from './PanelManager';
 
 // Visible for Testing
 export const lint_document = async (
@@ -55,6 +48,8 @@ export async function activate(ctx: vscode.ExtensionContext) {
   const manager = new PanelManager(ctx);
   const debugProvider = new DebugProvider(manager);
   const diagnosticCollection = vscode.languages.createDiagnosticCollection('dot-website');
+  
+  let zoomLevel = 1.0; // Default zoom level
 
   
   ctx.subscriptions.push(
@@ -111,7 +106,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
       }
     }),
     commands.registerCommand('dot-website.openActiveFile', () => {
-      const filename = window.activeTextEditor?.document?.fileName
+      const filename = window.activeTextEditor?.document?.fileName;
       if (!filename) {
         return;
       }
@@ -129,8 +124,6 @@ export async function activate(ctx: vscode.ExtensionContext) {
       panel?.show();
     }),
     commands.registerCommand('dot-website.controls.openSourceDocument', async (context?: vscode.Uri | vscode.TreeItem) => {
-      // NOTE: VS Code doesn't update resourceExtname context key correctly when a custom tree view 
-      // item is right-clicked, so we can't use it in package.json's context menu `when` clause
       const uri = context instanceof vscode.TreeItem ? context.resourceUri : context;
       if (uri && uri.fsPath.endsWith('.website')) {
         await window.showTextDocument(uri);
@@ -158,6 +151,19 @@ export async function activate(ctx: vscode.ExtensionContext) {
         retainContextWhenHidden: true,
       }
     }),
+
+    // Register Zoom In command
+    commands.registerCommand('dot-website.controls.zoomIn', () => {
+      zoomLevel += 0.1; // Increment zoom level
+      manager.current?.postMessage({ command: 'zoom', zoom: zoomLevel });
+    }),
+
+    // Register Zoom Out command
+    commands.registerCommand('dot-website.controls.zoomOut', () => {
+      zoomLevel -= 0.1; // Decrease zoom level
+      if (zoomLevel < 0.1) zoomLevel = 0.1; // Prevent too much zoom out
+      manager.current?.postMessage({ command: 'zoom', zoom: zoomLevel });
+    }),
   );
 
   try {
@@ -168,16 +174,17 @@ export async function activate(ctx: vscode.ExtensionContext) {
       {
         canOpenExternalUri: () => 2,
         openExternalUri(resolveUri: vscode.Uri) {
-          manager.createClient(resolveUri)
+          manager.createClient(resolveUri);
         },
       },
       {
         schemes: ['http', 'https'],
         label: 'Open URL using Dot Website',
       },
-    ))
+    ));
   } catch { }
   
+
   ctx.subscriptions.push(
     commands.registerCommand('dot-website.open_walkthrough', async () => {
       await commands.executeCommand(
@@ -186,6 +193,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
         false
       );
     }),
+
     commands.registerCommand('dot-website.walkthrough.step_1', async () => {
       const root_path = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
         ? vscode.workspace.workspaceFolders[0].uri.fsPath
@@ -210,6 +218,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
       window.showInformationMessage(`dot-website installed successfully. [Learn more](command:dot-website.notifications.cta.learn_more)`);
       commands.executeCommand('dot-website.open_walkthrough');
     }),
+    
     commands.registerCommand('dot-website.notifications.extension_updated', async () => {
       const cta = `See what's new`;
       const selection = await window.showInformationMessage(`Updated extension dot-website to v${currentVersion}!`, cta);
@@ -230,12 +239,14 @@ export async function activate(ctx: vscode.ExtensionContext) {
   if (!hasBeenActivatedBefore) {
     await commands.executeCommand('dot-website.notifications.extension_installed');
     await ctx.globalState.update('hasBeenActivatedBefore', true);
-	}
+  }
 
-	const currentVersion = ctx.extension.packageJSON.version;
-	const lastVersion = ctx.globalState.get('lastVersion');
+  const currentVersion = ctx.extension.packageJSON.version;
+  const lastVersion = ctx.globalState.get('lastVersion');
   if (hasBeenActivatedBefore && lastVersion !== currentVersion) {
     await commands.executeCommand('dot-website.notifications.extension_updated');
-		await ctx.globalState.update('lastVersion', currentVersion);
+    await ctx.globalState.update('lastVersion', currentVersion);
   }
 }
+
+export function deactivate() {}
